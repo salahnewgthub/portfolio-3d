@@ -1700,11 +1700,8 @@
           setTimeout(() => loadingScreen.classList.add('hidden'), 1100);
         }
 
-        // 2. Navigation click handlers
+        // 2. Navigation click handlers - use native scrollIntoView (respects CSS scroll-margin-top)
         const anchorLinks = Array.from(document.querySelectorAll('a[href^="#"]'));
-        const topBar = document.querySelector('.topbar');
-        const topBarHeight = topBar ? topBar.offsetHeight : 140;
-        document.documentElement.style.setProperty('--topbar-height', `${topBarHeight}px`);
 
         anchorLinks.forEach((anchor) => {
           anchor.addEventListener('click', (event) => {
@@ -1715,18 +1712,7 @@
 
             event.preventDefault();
             window.history.pushState(null, '', `#${targetId}`);
-
-            const baseOffset = 28;
-            const topOffset = topBar ? topBar.offsetHeight + baseOffset : topBarHeight + baseOffset;
-            const targetY = Math.max(0, targetElement.getBoundingClientRect().top + window.pageYOffset - topOffset);
-            window.scrollTo({ top: targetY, left: 0, behavior: 'smooth' });
-
-            setTimeout(() => {
-              const currentTop = targetElement.getBoundingClientRect().top;
-              if (currentTop < 0 || currentTop > topOffset + 18) {
-                window.scrollTo({ top: targetY, left: 0, behavior: 'auto' });
-              }
-            }, 500);
+            targetElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
           });
         });
       })();
