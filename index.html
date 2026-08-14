@@ -1703,6 +1703,25 @@
       })();
     </script>
 
+    <!-- Independent social links (runs even if Three.js fails) -->
+    <script>
+      (function() {
+        const socialLinks = document.getElementById('socialLinks');
+        if (socialLinks) {
+          const socials = [
+            { label: 'GitHub', url: 'https://github.com/salahnewgthub' },
+            { label: 'Facebook', url: 'https://www.facebook.com/salahuddin.muhammad.391' },
+            { label: 'LinkedIn', url: 'https://www.linkedin.com/in/salahuddin-muhammad' },
+            { label: 'YouTube', url: 'https://www.youtube.com/@MrSalah3' },
+            { label: 'WhatsApp', url: 'https://wa.me/923222820804' }
+          ];
+          socialLinks.innerHTML = socials.map(link =>
+            '<a href="' + link.url + '" target="_blank" rel="noreferrer">' + link.label + '</a>'
+          ).join('');
+        }
+      })();
+    </script>
+
     <!-- Independent cursor script (runs even if Three.js fails) -->
     <script>
       (function() {
