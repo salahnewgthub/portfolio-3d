@@ -334,9 +334,9 @@ export class ChatWidget {
   }
 }
 
-// Auto-initialize when DOM is ready
-if (typeof window !== 'undefined') {
-  document.addEventListener('DOMContentLoaded', () => {
-    window.chatWidget = new ChatWidget();
-  });
-}
+// Auto-initialization is handled by index.html to avoid double initialization
+// if (typeof window !== 'undefined') {
+//   document.addEventListener('DOMContentLoaded', () => {
+//     window.chatWidget = new ChatWidget();
+//   });
+// }
