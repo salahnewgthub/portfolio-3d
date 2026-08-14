@@ -2,10 +2,15 @@
   "version": 2,
   "builds": [
     { "src": "index.html", "use": "@vercel/static" },
+    { "src": "chatbot.js", "use": "@vercel/static" },
+    { "src": "favicon.svg", "use": "@vercel/static" },
     { "src": "api/**/*.js", "use": "@vercel/node" }
   ],
   "routes": [
+    { "src": "/api/chat", "dest": "/api/chat.js" },
     { "src": "/api/(.*)", "dest": "/api/$1" },
+    { "src": "/chatbot.js", "headers": { "Content-Type": "application/javascript" }, "dest": "/chatbot.js" },
+    { "src": "/favicon.svg", "headers": { "Content-Type": "image/svg+xml" }, "dest": "/favicon.svg" },
     { "src": "/node_modules/(.*)", "dest": "/node_modules/$1" },
     { "src": "/(.*)", "dest": "/index.html" }
   ]
