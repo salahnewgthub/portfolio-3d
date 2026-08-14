@@ -1691,9 +1691,16 @@
         window.addEventListener('resize', onResize);
     </script>
 
-    <!-- Navigation handler - separate non-module script to run independently of Three.js -->
+    <!-- Independent init script: runs even if Three.js fails/blocked on mobile -->
     <script>
       (function() {
+        // 1. Hide loading screen regardless of Three.js
+        const loadingScreen = document.getElementById('loadingScreen');
+        if (loadingScreen) {
+          setTimeout(() => loadingScreen.classList.add('hidden'), 1100);
+        }
+
+        // 2. Navigation click handlers
         const anchorLinks = Array.from(document.querySelectorAll('a[href^="#"]'));
         const topBar = document.querySelector('.topbar');
         const topBarHeight = topBar ? topBar.offsetHeight : 140;
