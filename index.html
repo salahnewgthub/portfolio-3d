@@ -114,6 +114,11 @@
             inset: 0;
             z-index: 0;
             background: linear-gradient(135deg, rgba(7, 11, 28, 0.95), rgba(4, 7, 18, 0.95));
+            pointer-events: none;
+        }
+
+        #scene canvas {
+            pointer-events: none;
         }
 
         .overlay {
@@ -1604,10 +1609,10 @@
           controls.autoRotate = true;
           controls.autoRotateSpeed = 0.45;
           controls.enableZoom = true;
+          // Enable pointer events on canvas for OrbitControls on non-touch devices
+          renderer.domElement.style.pointerEvents = 'auto';
         } else {
-          // On touch devices, disable pointer events on canvas AND scene container so clicks pass through to overlay
-          renderer.domElement.style.pointerEvents = 'none';
-          sceneEl.style.pointerEvents = 'none';
+          // On touch devices, canvas and scene already have pointer-events: none via CSS
         }
 
         const ambientLight = new THREE.HemisphereLight(0x87ceff, 0x0b1030, 1.25);
