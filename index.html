@@ -1518,35 +1518,6 @@
             </div>
         `;
 
-        const anchorLinks = Array.from(document.querySelectorAll('a[href^="#"]'));
-        const topBar = document.querySelector('.topbar');
-        const topBarHeight = topBar ? topBar.offsetHeight : 140;
-        document.documentElement.style.setProperty('--topbar-height', `${topBarHeight}px`);
-
-        anchorLinks.forEach((anchor) => {
-            anchor.addEventListener('click', (event) => {
-                const targetId = anchor.getAttribute('href')?.slice(1);
-                if (!targetId || targetId === 'loadingScreen') return;
-                const targetElement = document.getElementById(targetId);
-                if (!targetElement) return;
-
-                event.preventDefault();
-                window.history.pushState(null, '', `#${targetId}`);
-
-                const baseOffset = 28;
-                const topOffset = topBar ? topBar.offsetHeight + baseOffset : topBarHeight + baseOffset;
-                const targetY = Math.max(0, targetElement.getBoundingClientRect().top + window.pageYOffset - topOffset);
-                window.scrollTo({ top: targetY, left: 0, behavior: 'smooth' });
-
-                setTimeout(() => {
-                    const currentTop = targetElement.getBoundingClientRect().top;
-                    if (currentTop < 0 || currentTop > topOffset + 18) {
-                        window.scrollTo({ top: targetY, left: 0, behavior: 'auto' });
-                    }
-                }, 500);
-            });
-        });
-
         const loadingScreen = document.getElementById('loadingScreen');
         const cursorDot = document.querySelector('.cursor-dot');
         const cursorRing = document.querySelector('.cursor-ring');
@@ -1718,6 +1689,40 @@
             renderer.setSize(window.innerWidth, window.innerHeight);
         }
         window.addEventListener('resize', onResize);
+    </script>
+
+    <!-- Navigation handler - separate non-module script to run independently of Three.js -->
+    <script>
+      (function() {
+        const anchorLinks = Array.from(document.querySelectorAll('a[href^="#"]'));
+        const topBar = document.querySelector('.topbar');
+        const topBarHeight = topBar ? topBar.offsetHeight : 140;
+        document.documentElement.style.setProperty('--topbar-height', `${topBarHeight}px`);
+
+        anchorLinks.forEach((anchor) => {
+          anchor.addEventListener('click', (event) => {
+            const targetId = anchor.getAttribute('href')?.slice(1);
+            if (!targetId || targetId === 'loadingScreen') return;
+            const targetElement = document.getElementById(targetId);
+            if (!targetElement) return;
+
+            event.preventDefault();
+            window.history.pushState(null, '', `#${targetId}`);
+
+            const baseOffset = 28;
+            const topOffset = topBar ? topBar.offsetHeight + baseOffset : topBarHeight + baseOffset;
+            const targetY = Math.max(0, targetElement.getBoundingClientRect().top + window.pageYOffset - topOffset);
+            window.scrollTo({ top: targetY, left: 0, behavior: 'smooth' });
+
+            setTimeout(() => {
+              const currentTop = targetElement.getBoundingClientRect().top;
+              if (currentTop < 0 || currentTop > topOffset + 18) {
+                window.scrollTo({ top: targetY, left: 0, behavior: 'auto' });
+              }
+            }, 500);
+          });
+        });
+      })();
     </script>
 </body>
 </html>
