@@ -1554,6 +1554,15 @@
             cursorDot.style.opacity = '1';
         });
 
+        // Touch handling for tilt effect on mobile (OrbitControls disabled)
+        window.addEventListener('touchmove', (event) => {
+            if (event.touches.length > 0) {
+                const touch = event.touches[0];
+                pointer.x = (touch.clientX / window.innerWidth - 0.5) * 2;
+                pointer.y = (touch.clientY / window.innerHeight - 0.5) * 2;
+            }
+        }, { passive: true });
+
         const revealItems = Array.from(document.querySelectorAll('.reveal'));
         const observer = new IntersectionObserver((entries) => {
             entries.forEach((entry) => {
@@ -1580,14 +1589,19 @@
         renderer.setSize(window.innerWidth, window.innerHeight);
         sceneEl.appendChild(renderer.domElement);
 
-        const controls = new OrbitControls(camera, renderer.domElement);
-        controls.enableDamping = true;
-        controls.enablePan = false;
-        controls.minDistance = 4;
-        controls.maxDistance = 14;
-        controls.autoRotate = true;
-        controls.autoRotateSpeed = 0.45;
-        controls.enableZoom = true;
+        // Disable OrbitControls on touch devices so links/buttons work on mobile
+        const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+        let controls;
+        if (!isTouchDevice) {
+          controls = new OrbitControls(camera, renderer.domElement);
+          controls.enableDamping = true;
+          controls.enablePan = false;
+          controls.minDistance = 4;
+          controls.maxDistance = 14;
+          controls.autoRotate = true;
+          controls.autoRotateSpeed = 0.45;
+          controls.enableZoom = true;
+        }
 
         const ambientLight = new THREE.HemisphereLight(0x87ceff, 0x0b1030, 1.25);
         scene.add(ambientLight);
@@ -1672,7 +1686,7 @@
                 mesh.rotation.y = elapsed * (0.5 + index * 0.09) + tiltY * 0.4;
             });
             particles.rotation.y = elapsed * 0.05 + tiltY * 0.1;
-            controls.update();
+            if (controls) controls.update();
             renderer.render(scene, camera);
         }
         animate();
