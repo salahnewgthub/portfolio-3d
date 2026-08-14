@@ -1461,44 +1461,25 @@
         import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
         const portfolio = {
-            name: 'Salahuddin Muhammad',
-            headline: 'Creative developer building immersive digital experiences.',
+            name: ‘Salahuddin Muhammad’,
+            headline: ‘Creative developer building immersive digital experiences.’,
             socials: [
-                { label: 'GitHub', url: 'https://github.com/salahnewgthub' },
-                { label: 'Facebook', url: 'https://www.facebook.com/salahuddin.muhammad.391' },
-                { label: 'LinkedIn', url: 'https://www.linkedin.com/in/salahuddin-muhammad' },
-                { label: 'YouTube', url: 'https://www.youtube.com/@MrSalah3' },
-                { label: 'WhatsApp', url: 'https://wa.me/923222820804' }
-            ],
-            projects: [
-                { title: '3D Portfolio Experience', summary: 'A cinematic, interactive portfolio concept designed to feel like a living scene rather than a static page.', stack: ['Three.js', 'WebGL', 'Immersive UI'], link: 'https://github.com/salahnewgthub' },
-                { title: 'Interactive Product Interfaces', summary: 'Polished front-end systems focused on clarity, motion, and a memorable user journey.', stack: ['HTML', 'CSS', 'JavaScript'], link: 'https://www.linkedin.com/in/salahuddin-muhammad' },
-                { title: 'Creative Landing Pages', summary: 'Story-driven digital experiences built for presentation, brand presence, and strong first impressions.', stack: ['Animation', 'Interaction', 'Storytelling'], link: 'https://wa.me/923222820804' }
+                { label: ‘GitHub’, url: ‘https://github.com/salahnewgthub’ },
+                { label: ‘Facebook’, url: ‘https://www.facebook.com/salahuddin.muhammad.391’ },
+                { label: ‘LinkedIn’, url: ‘https://www.linkedin.com/in/salahuddin-muhammad’ },
+                { label: ‘YouTube’, url: ‘https://www.youtube.com/@MrSalah3’ },
+                { label: ‘WhatsApp’, url: ‘https://wa.me/923222820804’ }
             ],
             contact: {
-                title: 'Let’s build something memorable',
-                body: 'Available for freelance work, creative collaborations, and ambitious digital ideas.',
-                primary: 'https://wa.me/923222820804',
-                secondary: 'https://www.linkedin.com/in/salahuddin-muhammad'
+                title: ‘Let’s build something memorable’,
+                body: ‘Available for freelance work, creative collaborations, and ambitious digital ideas.’,
+                primary: ‘https://wa.me/923222820804’,
+                secondary: ‘https://www.linkedin.com/in/salahuddin-muhammad’
             }
         };
 
         const socialLinks = document.getElementById('socialLinks');
         socialLinks.innerHTML = portfolio.socials.map(link => `<a href="${link.url}" target="_blank" rel="noreferrer">${link.label}</a>`).join('');
-
-        const projectGrid = document.getElementById('projectGrid');
-        if (projectGrid) {
-            projectGrid.innerHTML = portfolio.projects.map(project => `
-                <article class="project-card">
-                    <h3>${project.title}</h3>
-                    <p>${project.summary}</p>
-                    <div class="stack">
-                        ${project.stack.map(item => `<span>${item}</span>`).join('')}
-                    </div>
-                    <a class="project-link" href="${project.link}" target="_blank" rel="noreferrer">View project ↗</a>
-                </article>
-            `).join('');
-        }
 
         const contactContent = document.getElementById('contactContent');
         contactContent.innerHTML = `
