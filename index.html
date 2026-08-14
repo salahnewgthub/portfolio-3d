@@ -1709,7 +1709,7 @@
                 entry.target.classList.add('visible');
               }
             });
-          }, { threshold: 0.18 });
+          }, { threshold: 0.05, rootMargin: '100px' }); // Lower threshold + rootMargin so tall elements trigger on mobile
           revealItems.forEach((item) => observer.observe(item));
         }
 
