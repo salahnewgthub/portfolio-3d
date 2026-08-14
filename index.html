@@ -1601,6 +1601,9 @@
           controls.autoRotate = true;
           controls.autoRotateSpeed = 0.45;
           controls.enableZoom = true;
+        } else {
+          // On touch devices, disable pointer events on canvas so clicks pass through to overlay
+          renderer.domElement.style.pointerEvents = 'none';
         }
 
         const ambientLight = new THREE.HemisphereLight(0x87ceff, 0x0b1030, 1.25);
