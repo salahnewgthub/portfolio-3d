@@ -1700,7 +1700,20 @@
           setTimeout(() => loadingScreen.classList.add('hidden'), 1100);
         }
 
-        // 2. Navigation click handlers - use native scrollIntoView (respects CSS scroll-margin-top)
+        // 2. Make all .reveal elements visible (IntersectionObserver fallback if Three.js fails)
+        const revealItems = Array.from(document.querySelectorAll('.reveal'));
+        if (revealItems.length > 0) {
+          const observer = new IntersectionObserver((entries) => {
+            entries.forEach((entry) => {
+              if (entry.isIntersecting) {
+                entry.target.classList.add('visible');
+              }
+            });
+          }, { threshold: 0.18 });
+          revealItems.forEach((item) => observer.observe(item));
+        }
+
+        // 3. Navigation click handlers - use native scrollIntoView (respects CSS scroll-margin-top)
         const anchorLinks = Array.from(document.querySelectorAll('a[href^="#"]'));
 
         anchorLinks.forEach((anchor) => {
