@@ -1702,5 +1702,27 @@
         });
       })();
     </script>
+
+    <!-- Independent cursor script (runs even if Three.js fails) -->
+    <script>
+      (function() {
+        const cursorDot = document.querySelector('.cursor-dot');
+        const cursorRing = document.querySelector('.cursor-ring');
+        if (!cursorDot || !cursorRing) return;
+
+        let isTouch = false;
+        window.addEventListener('touchstart', () => { isTouch = true; }, { passive: true });
+        window.addEventListener('mousemove', () => { if (!isTouch) { cursorDot.style.opacity = '1'; cursorRing.style.opacity = '1'; } }, { passive: true });
+        window.addEventListener('mouseleave', () => { cursorDot.style.opacity = '0'; cursorRing.style.opacity = '0'; });
+
+        document.addEventListener('mousemove', (e) => {
+          if (isTouch) return;
+          cursorDot.style.left = e.clientX + 'px';
+          cursorDot.style.top = e.clientY + 'px';
+          cursorRing.style.left = e.clientX + 'px';
+          cursorRing.style.top = e.clientY + 'px';
+        });
+      })();
+    </script>
 </body>
 </html>
