@@ -1702,6 +1702,10 @@
 
             event.preventDefault();
             window.history.pushState(null, '', `#${targetId}`);
+            // Reveal the WhatsApp button if it's the target (it's hidden by default)
+            if (targetId === 'whatsappConnectBtn') {
+              targetElement.style.display = 'flex';
+            }
             targetElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
           });
         });
