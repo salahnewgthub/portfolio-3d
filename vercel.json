@@ -9,11 +9,6 @@
     { "src": "/api/chat", "dest": "/api/chat.js" },
     { "src": "/api/(.*)", "dest": "/api/$1" },
     { "src": "/chatbot.js", "headers": { "Content-Type": "application/javascript" }, "dest": "/chatbot.js" },
-    { "src": "/favicon.ico", "status": 404 },
-    { "src": "/favicon.svg", "status": 404 },
-    { "src": "/apple-touch-icon.png", "status": 404 },
-    { "src": "/apple-touch-icon-precomposed.png", "status": 404 },
-    { "src": "/manifest.json", "status": 404 },
     { "src": "/node_modules/(.*)", "dest": "/node_modules/$1" },
     { "src": "/(.*)", "dest": "/index.html" }
   ]
