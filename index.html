@@ -65,6 +65,13 @@
             border: 1px solid rgba(255, 255, 255, 0.4);
         }
 
+        @media (hover: none), (pointer: coarse) {
+            .cursor-dot,
+            .cursor-ring {
+                display: none;
+            }
+        }
+
         .loading-screen {
             position: fixed;
             inset: 0;
