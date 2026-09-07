@@ -1,0 +1,12 @@
+{
+    "chat.tools.terminal.autoApprove": {
+        "/^node scripts/smoke\\.js$/": {
+            "approve": true,
+            "matchCommandLine": true
+        },
+        "/^node -e 'const fs=require\\(\"fs\"\\); const html=fs\\.readFileSync\\(\"index\\.html\",\"utf8\"\\); const config=JSON\\.parse\\(fs\\.readFileSync\\(\"vercel\\.json\",\"utf8\"\\)\\); if \\(!html\\.includes\\(\"href=\\\\\"/movie-video\\.mp4\\\\\"\"\\)\\) throw new Error\\(\"video link missing\"\\); if \\(!config\\.builds\\.some\\(build => build\\.src === \"movie-video\\.mp4\"\\)\\) throw new Error\\(\"video build missing\"\\); console\\.log\\(\"video link and Vercel static build verified\"\\);'$/": {
+            "approve": true,
+            "matchCommandLine": true
+        }
+    }
+}
