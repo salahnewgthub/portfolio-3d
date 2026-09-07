@@ -10,6 +10,7 @@
     { "src": "/api/chat", "dest": "/api/chat.js" },
     { "src": "/api/(.*)", "dest": "/api/$1" },
     { "src": "/chatbot.js", "headers": { "Content-Type": "application/javascript" }, "dest": "/chatbot.js" },
+    { "src": "/movie-video.mp4", "headers": { "Content-Type": "video/mp4" }, "dest": "/movie-video.mp4" },
     { "src": "/favicon.ico", "status": 404 },
     { "src": "/favicon.svg", "status": 404 },
     { "src": "/apple-touch-icon.png", "status": 404 },
