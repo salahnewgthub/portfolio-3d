@@ -7,7 +7,7 @@ const KNOWLEDGE_BASE = [
     id: 'about',
     category: 'About',
     keywords: ['about', 'who', 'bio', 'background', 'salahuddin', 'muhammad', 'developer', 'experience', 'aspiring'],
-    content: `Salahuddin Muhammad is an aspiring AI Automation & Agentic AI Developer passionate about building intelligent systems, AI agents, RAG chatbots, and automation solutions that solve real-world problems. He is dedicated to continuously learning, exploring emerging technologies, and transforming innovative ideas into practical, impactful AI solutions.`,
+    content: `Salahuddin Muhammad is an AI automation and agentic-AI builder focused on practical experiments with AI agents, RAG chatbots, connected software, and computer workflows. He is interested in turning natural-language instructions into useful, bounded actions while staying precise about what has actually been demonstrated.`,
   },
   {
     id: 'skills-agentic-ai',
@@ -31,7 +31,7 @@ const KNOWLEDGE_BASE = [
     id: 'skills-personal-ai-employees',
     category: 'Skills',
     keywords: ['personal ai', 'copilot', 'virtual assistant', 'assistant', 'productivity', 'ai employee', 'skills', 'skill'],
-    content: `Personal AI Employees: Crafting AI copilots and virtual assistants that extend teams and improve productivity across roles.`,
+    content: `AI Digital Employees: Exploring delegated software work where an agent can receive a task, use connected tools, verify an outcome, and report back to a human. This is an evolving direction rather than a claim of unlimited autonomy.`,
   },
   {
     id: 'skills-api-integration',
@@ -67,7 +67,7 @@ const KNOWLEDGE_BASE = [
     id: 'project-ai-employee',
     category: 'Projects',
     keywords: ['ai employee', 'digital employee', 'openclaw', 'whatsapp', 'discord', 'remote', 'task delegation', 'autonomous', '24/7', 'mobile', 'employee', 'digital worker', 'agent'],
-    content: `24/7 Autonomous AI Digital Employee: An agentic AI system powered by OpenClaw, connected to WhatsApp and Discord for remote task delegation. Allows delegating tasks from mobile phone while travelling. Features: Work from anywhere, 24/7 digital employee, natural language interaction, autonomous task execution, mobile-first control via WhatsApp/Discord, task completion feedback. Tech: OpenClaw, Agentic AI, Autonomous AI Agents, WhatsApp Integration, Discord Integration, AI Model Integration, Task Automation, Remote AI Interaction, Tool-Based AI Workflows.`,
+    content: `AI Digital Employee direction: An evolving agentic-AI workflow exploring remote task delegation through connected communication and development tools. The concept is to receive natural-language work, execute bounded tasks, and report results. The site presents this as a work in progress, not as unlimited autonomy. Tech explored includes OpenClaw, agentic AI, WhatsApp, Discord, model integration, task automation, and tool-based workflows.`,
   },
   {
     id: 'project-remote-codex',

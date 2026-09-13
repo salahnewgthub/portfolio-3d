@@ -1,1985 +1,258 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Salahuddin Muhammad's immersive 3D portfolio website with projects, links, and contact information.">
-    <title>Salahuddin Muhammad | Creative Developer</title>
-    <link rel="icon" href="data:,">
-    <link rel="apple-touch-icon" href="data:,">
-    <link rel="manifest" href="data:,">
-    <style>
-        :root {
-            color-scheme: dark;
-            --bg: #060816;
-            --panel: rgba(8, 12, 28, 0.72);
-            --panel-border: rgba(255, 255, 255, 0.14);
-            --text: #f5f7ff;
-            --muted: #8ea0c7;
-            --accent: #6dd3ff;
-            --accent-2: #a48bff;
-        }
-
-        * { box-sizing: border-box; }
-        html {
-            scroll-behavior: smooth;
-            scroll-padding-top: calc(var(--topbar-height, 140px) + 24px);
-        }
-        body {
-            margin: 0;
-            font-family: Inter, "Segoe UI", Roboto, Arial, sans-serif;
-            background: radial-gradient(circle at top, #13204d 0%, var(--bg) 65%);
-            color: var(--text);
-            overflow-x: hidden;
-            cursor: none;
-            touch-action: manipulation;
-            -webkit-tap-highlight-color: rgba(255, 255, 255, 0.12);
-        }
-
-        a {
-            color: inherit;
-            text-decoration: none;
-            touch-action: manipulation;
-        }
-
-        .cursor-dot,
-        .cursor-ring {
-            position: fixed;
-            pointer-events: none;
-            border-radius: 999px;
-            z-index: 999;
-            transform: translate(-50%, -50%);
-            transition: transform 180ms ease, opacity 180ms ease;
-        }
-
-        .cursor-dot {
-            width: 8px;
-            height: 8px;
-            background: var(--accent);
-            box-shadow: 0 0 20px rgba(109, 211, 255, 0.8);
-        }
-
-        .cursor-ring {
-            width: 34px;
-            height: 34px;
-            border: 1px solid rgba(255, 255, 255, 0.4);
-        }
-
-        @media (hover: none), (pointer: coarse) {
-            .cursor-dot,
-            .cursor-ring {
-                display: none;
-            }
-        }
-
-        .loading-screen {
-            position: fixed;
-            inset: 0;
-            z-index: 1000;
-            display: grid;
-            place-items: center;
-            background: radial-gradient(circle at center, rgba(19, 32, 77, 0.96), rgba(6, 8, 22, 1));
-            transition: opacity 700ms ease, visibility 700ms ease;
-        }
-
-        .loading-screen.hidden {
-            opacity: 0;
-            visibility: hidden;
-        }
-
-        .loading-screen .loader-box {
-            padding: 24px;
-            border-radius: 22px;
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            text-align: center;
-            min-width: 220px;
-        }
-
-        .loading-screen .loader-bar {
-            width: 100%;
-            height: 6px;
-            border-radius: 999px;
-            background: rgba(255, 255, 255, 0.1);
-            overflow: hidden;
-            margin-top: 16px;
-        }
-
-        .loading-screen .loader-bar span {
-            display: block;
-            height: 100%;
-            width: 0%;
-            background: linear-gradient(90deg, var(--accent), var(--accent-2));
-            animation: loadPulse 1.2s ease forwards;
-        }
-
-        @keyframes loadPulse {
-            to { width: 100%; }
-        }
-        canvas { display: block; }
-
-        #scene {
-            position: fixed;
-            inset: 0;
-            z-index: -1;
-            background: linear-gradient(135deg, rgba(7, 11, 28, 0.95), rgba(4, 7, 18, 0.95));
-            pointer-events: none;
-            touch-action: none;
-        }
-
-        #scene canvas {
-            pointer-events: none;
-            touch-action: none;
-        }
-
-        .overlay {
-            position: relative;
-            z-index: 2;
-            min-height: 100vh;
-            padding: 24px clamp(18px, 4vw, 40px) 80px;
-            pointer-events: auto;
-            touch-action: manipulation;
-        }
-
-        .topbar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 16px;
-            padding: 12px 0 30px;
-            position: sticky;
-            top: 0;
-            z-index: 20;
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            background: linear-gradient(180deg, rgba(6, 8, 22, 0.85), rgba(6, 8, 22, 0.75));
-            touch-action: manipulation;
-            pointer-events: auto;
-        }
-
-        .brand {
-            font-size: 1rem;
-            letter-spacing: 0.26em;
-            text-transform: uppercase;
-            font-weight: 700;
-            color: var(--accent);
-        }
-
-        .nav-links {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 14px;
-            color: var(--muted);
-            pointer-events: auto;
-            touch-action: manipulation;
-        }
-
-        .nav-links a {
-            transition: color 180ms ease;
-            pointer-events: auto;
-            touch-action: manipulation;
-        }
-
-        .nav-links a:hover { color: var(--text); }
-
-        .hero-shell {
-            position: relative;
-            min-height: calc(100vh - 74px);
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            padding-bottom: 18px;
-        }
-
-        .hero-ambient {
-            position: absolute;
-            right: -8px;
-            top: 8%;
-            font-size: clamp(4rem, 18vw, 11rem);
-            line-height: 0.9;
-            font-weight: 800;
-            letter-spacing: 0.04em;
-            color: rgba(255, 255, 255, 0.06);
-            pointer-events: none;
-            user-select: none;
-        }
-
-        .hero {
-            display: grid;
-            grid-template-columns: 1.2fr 0.8fr;
-            gap: clamp(20px, 4vw, 40px);
-            align-items: center;
-            min-height: 72vh;
-            position: relative;
-            z-index: 2;
-        }
-
-        .hero-copy h1 {
-            font-size: clamp(2.4rem, 5vw, 4.5rem);
-            line-height: 0.95;
-            margin: 0 0 16px;
-            letter-spacing: -0.03em;
-            max-width: 700px;
-        }
-
-        .hero-copy .eyebrow {
-            margin: 0 0 12px;
-            text-transform: uppercase;
-            letter-spacing: 0.3em;
-            color: var(--accent);
-            font-size: 0.8rem;
-            font-weight: 700;
-        }
-
-        .hero-copy p {
-            font-size: 1.05rem;
-            line-height: 1.8;
-            color: var(--muted);
-            max-width: 650px;
-            margin: 0 0 24px;
-        }
-
-        .hero-actions {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 12px;
-            margin-bottom: 24px;
-        }
-
-        .btn {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            padding: 12px 18px;
-            border-radius: 999px;
-            border: 1px solid transparent;
-            transition: transform 180ms ease, border-color 180ms ease, background 180ms ease;
-        }
-
-        .btn:hover { transform: translateY(-2px); }
-
-        .btn.primary {
-            background: linear-gradient(135deg, var(--accent), var(--accent-2));
-            color: #03111f;
-            font-weight: 700;
-        }
-
-        .btn.secondary {
-            border-color: var(--panel-border);
-            background: rgba(255, 255, 255, 0.04);
-            color: var(--text);
-        }
-
-        .social-links {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            margin-top: 8px;
-        }
-
-        .social-links a {
-            padding: 9px 12px;
-            border-radius: 999px;
-            background: rgba(255, 255, 255, 0.04);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            font-size: 0.95rem;
-            color: var(--text);
-        }
-
-        .hero-card,
-        .section-card {
-            background: var(--panel);
-            border: 1px solid var(--panel-border);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border-radius: 24px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.28);
-        }
-
-        .hero-card {
-            padding: 24px;
-            display: grid;
-            gap: 16px;
-        }
-
-        .hero-card .mini-title {
-            margin: 0;
-            font-size: 0.78rem;
-            text-transform: uppercase;
-            letter-spacing: 0.3em;
-            color: var(--accent);
-        }
-
-        .hero-card ul {
-            margin: 0;
-            padding-left: 18px;
-            color: var(--muted);
-            line-height: 1.8;
-        }
-
-        .section {
-            padding-top: clamp(24px, 4vw, 40px);
-            scroll-margin-top: calc(var(--topbar-height, 140px) + 24px);
-        }
-
-        .reveal {
-            opacity: 0;
-            transform: translateY(24px);
-            transition: opacity 700ms ease, transform 700ms ease;
-        }
-
-        .reveal.visible {
-            opacity: 1;
-            transform: translateY(0);
-        }
-
-        .section-card {
-            padding: 24px;
-        }
-
-        #about .section-card {
-            max-width: 100%;
-            width: 100%;
-        }
-
-        #about .info-grid {
-            display: block;
-        }
-
-        #about .info-card {
-            width: 100%;
-        }
-
-        .section-heading {
-            display: flex;
-            justify-content: space-between;
-            gap: 16px;
-            align-items: end;
-            margin-bottom: 20px;
-            flex-wrap: wrap;
-        }
-
-        .section-heading h2 {
-            margin: 0;
-            font-size: clamp(1.35rem, 2.6vw, 1.85rem);
-        }
-
-        .section-heading p {
-            margin: 0;
-            color: var(--muted);
-            max-width: 520px;
-        }
-
-        .project-grid {
-            display: grid;
-            grid-template-columns: repeat(3, minmax(0, 1fr));
-            gap: 16px;
-        }
-
-        .project-card {
-            padding: 18px;
-            border-radius: 20px;
-            background: rgba(255, 255, 255, 0.04);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            display: grid;
-            gap: 10px;
-            transition: transform 220ms ease, border-color 220ms ease, background 220ms ease;
-        }
-
-        .project-card:hover {
-            transform: translateY(-4px);
-            border-color: rgba(109, 211, 255, 0.4);
-            background: rgba(255, 255, 255, 0.06);
-        }
-
-        .project-card h3 {
-            margin: 0;
-            font-size: 1.02rem;
-        }
-
-        .project-card p {
-            margin: 0;
-            color: var(--muted);
-            line-height: 1.65;
-            font-size: 0.96rem;
-        }
-
-        .stack {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-        }
-
-        .stack span {
-            padding: 6px 10px;
-            border-radius: 999px;
-            background: rgba(109, 211, 255, 0.14);
-            color: var(--accent);
-            font-size: 0.8rem;
-            font-weight: 600;
-        }
-
-        .info-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 16px;
-        }
-
-        .info-card {
-            padding: 18px;
-            border-radius: 18px;
-            background: rgba(255, 255, 255, 0.04);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-        }
-
-        .service-grid {
-            display: grid;
-            grid-template-columns: repeat(3, minmax(0, 1fr));
-            gap: 16px;
-            margin-top: 18px;
-        }
-
-        .service-card {
-            padding: 20px;
-            border-radius: 22px;
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            display: grid;
-            gap: 12px;
-            min-height: 140px;
-        }
-
-        .service-card h3 {
-            margin: 0;
-            font-size: 1rem;
-        }
-
-        .service-card p {
-            margin: 0;
-            color: var(--muted);
-            line-height: 1.7;
-            font-size: 0.94rem;
-        }
-
-        .remote-delegation {
-            margin: 28px 0;
-            padding: clamp(18px, 3vw, 28px);
-            border: 1px solid rgba(109, 211, 255, 0.24);
-            border-radius: 22px;
-            background: linear-gradient(135deg, rgba(109, 211, 255, 0.09), rgba(164, 139, 255, 0.08));
-            overflow: hidden;
-        }
-
-        .remote-delegation-header {
-            display: flex;
-            justify-content: space-between;
-            gap: 18px;
-            align-items: flex-start;
-            margin-bottom: 22px;
-        }
-
-        .remote-delegation-kicker {
-            margin: 0 0 8px;
-            color: var(--accent);
-            font-size: 0.75rem;
-            font-weight: 700;
-            letter-spacing: 0.2em;
-            text-transform: uppercase;
-        }
-
-        .remote-delegation h2 {
-            margin: 0;
-            font-size: clamp(1.35rem, 2.8vw, 2rem);
-            line-height: 1.1;
-        }
-
-        .remote-delegation-intro {
-            max-width: 680px;
-            margin: 10px 0 0;
-            color: var(--muted);
-            line-height: 1.75;
-        }
-
-        .remote-delegation-badge {
-            flex: 0 0 auto;
-            padding: 8px 11px;
-            border: 1px solid rgba(127, 255, 212, 0.28);
-            border-radius: 999px;
-            color: #7fffd4;
-            background: rgba(127, 255, 212, 0.08);
-            font-size: 0.72rem;
-            font-weight: 700;
-            letter-spacing: 0.08em;
-            text-transform: uppercase;
-        }
-
-        .remote-flow {
-            display: grid;
-            grid-template-columns: repeat(4, minmax(0, 1fr));
-            gap: 12px;
-            margin: 22px 0;
-        }
-
-        .remote-flow-step {
-            position: relative;
-            min-height: 150px;
-            padding: 16px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 16px;
-            background: rgba(3, 17, 31, 0.36);
-            animation: flowRise 700ms ease both;
-        }
-
-        .remote-flow-step:nth-child(2) { animation-delay: 90ms; }
-        .remote-flow-step:nth-child(3) { animation-delay: 180ms; }
-        .remote-flow-step:nth-child(4) { animation-delay: 270ms; }
-
-        @keyframes flowRise {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .remote-flow-step::after {
-            content: "→";
-            position: absolute;
-            right: -15px;
-            top: 50%;
-            color: var(--accent);
-            font-size: 1.3rem;
-            transform: translateY(-50%);
-            z-index: 1;
-        }
-
-        .remote-flow-step:last-child::after { content: none; }
-
-        .remote-flow-number {
-            display: block;
-            margin-bottom: 18px;
-            color: var(--accent);
-            font-size: 0.72rem;
-            font-weight: 700;
-            letter-spacing: 0.16em;
-        }
-
-        .remote-flow-step h3 {
-            margin: 0 0 8px;
-            font-size: 1rem;
-        }
-
-        .remote-flow-step p {
-            margin: 0;
-            color: var(--muted);
-            font-size: 0.88rem;
-            line-height: 1.55;
-        }
-
-        .remote-example {
-            display: grid;
-            grid-template-columns: 1fr 0.8fr;
-            gap: 14px;
-            align-items: stretch;
-        }
-
-        .remote-example-panel {
-            padding: 16px;
-            border-radius: 16px;
-            background: rgba(255, 255, 255, 0.045);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-        }
-
-        .remote-example-label {
-            display: block;
-            margin-bottom: 10px;
-            color: var(--muted);
-            font-size: 0.74rem;
-            letter-spacing: 0.14em;
-            text-transform: uppercase;
-        }
-
-        .remote-example blockquote {
-            margin: 0;
-            color: var(--text);
-            line-height: 1.6;
-        }
-
-        .remote-example code {
-            display: block;
-            color: #7fffd4;
-            font: 600 0.95rem/1.6 ui-monospace, SFMono-Regular, Consolas, monospace;
-            overflow-wrap: anywhere;
-        }
-
-        .remote-delegation-note {
-            margin: 18px 0 0;
-            color: var(--muted);
-            font-size: 0.9rem;
-            line-height: 1.65;
-        }
-
-        .info-card h3 { margin-top: 0; }
-        .info-card p, .info-card li { color: var(--muted); line-height: 1.7; }
-
-        .project-link {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            color: var(--accent);
-            font-weight: 600;
-            font-size: 0.92rem;
-        }
-
-        .contact-card {
-            padding: 24px;
-            border-radius: 22px;
-            background: linear-gradient(135deg, rgba(109, 211, 255, 0.16), rgba(164, 139, 255, 0.16));
-            border: 1px solid rgba(255, 255, 255, 0.12);
-            display: grid;
-            gap: 16px;
-        }
-
-        .contact-actions {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 12px;
-        }
-
-        .scroll-hint {
-            margin-top: 16px;
-            color: var(--muted);
-            font-size: 0.9rem;
-            letter-spacing: 0.24em;
-            text-transform: uppercase;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .scroll-hint::before {
-            content: "";
-            width: 34px;
-            height: 1px;
-            background: linear-gradient(90deg, var(--accent), transparent);
-        }
-
-        .footer {
-            text-align: center;
-            padding-top: 24px;
-            color: var(--muted);
-        }
-
-        @media (max-width: 1000px) {
-            .hero { grid-template-columns: 1fr; }
-            .hero-copy h1 { font-size: clamp(2.2rem, 5vw, 3.8rem); }
-            .hero-copy p { max-width: 100%; }
-            .section-heading { flex-direction: column; align-items: flex-start; }
-            .section-heading p { max-width: 100%; }
-            .service-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-            .project-grid { grid-template-columns: 1fr; }
-            .info-grid { grid-template-columns: 1fr; }
-            .hero-ambient { display: none; }
-            .remote-flow { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-            .remote-flow-step::after { content: none; }
-        }
-
-        @media (max-width: 760px) {
-            .hero-actions { flex-direction: column; align-items: stretch; }
-            .btn { width: 100%; justify-content: center; }
-            .service-grid { grid-template-columns: 1fr; }
-            .section-card { padding: 20px; }
-            .hero-copy h1 { font-size: clamp(2rem, 7vw, 3.2rem); }
-            .hero-copy p, .service-card p, .section-heading p {
-                font-size: 0.98rem;
-                line-height: 1.7;
-            }
-            .social-links { justify-content: center; width: 100%; }
-            .nav-links { gap: 10px; }
-            .topbar { padding-bottom: 18px; }
-            .scroll-hint { text-align: center; }
-            .remote-delegation-header { flex-direction: column; }
-            .remote-example { grid-template-columns: 1fr; }
-        }
-
-        @media (max-width: 640px) {
-            .overlay { padding-inline: 14px; }
-            .topbar { flex-direction: column; align-items: flex-start; }
-            .hero-copy h1 { font-size: 2.45rem; }
-            .hero { gap: 24px; }
-            .section-card { border-radius: 20px; }
-            .hero-actions { gap: 10px; }
-            .service-card { padding: 18px; }
-            .service-card h3 { font-size: 1rem; }
-            .remote-flow { grid-template-columns: 1fr; }
-            .remote-flow-step { min-height: 0; }
-        }
-
-        /* Chat Widget Styles */
-        #chat-widget {
-            position: fixed;
-            bottom: 24px;
-            right: 24px;
-            z-index: 100;
-            font-family: inherit;
-        }
-
-        .chat-toggle {
-            width: 56px;
-            height: 56px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, var(--accent), var(--accent-2));
-            border: none;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 8px 32px rgba(109, 211, 255, 0.3), 0 0 0 1px rgba(255, 255, 255, 0.1);
-            transition: transform 200ms ease, box-shadow 200ms ease;
-            position: relative;
-            color: #03111f;
-        }
-
-        .chat-toggle:hover {
-            transform: scale(1.08);
-            box-shadow: 0 12px 40px rgba(109, 211, 255, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.15);
-        }
-
-        .chat-toggle:active {
-            transform: scale(0.95);
-        }
-
-        .chat-toggle .close-icon {
-            display: none;
-        }
-
-        .chat-toggle.open .chat-icon {
-            display: none;
-        }
-
-        .chat-toggle.open .close-icon {
-            display: block;
-        }
-
-        .notification-badge {
-            position: absolute;
-            top: 4px;
-            right: 4px;
-            min-width: 20px;
-            height: 20px;
-            border-radius: 999px;
-            background: var(--accent-2);
-            color: #03111f;
-            font-size: 0.7rem;
-            font-weight: 700;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 0 6px;
-            box-shadow: 0 2px 8px rgba(164, 139, 255, 0.4);
-            animation: pulse 2s ease-in-out infinite;
-        }
-
-        @keyframes pulse {
-            0%, 100% { opacity: 1; transform: scale(1); }
-            50% { opacity: 0.7; transform: scale(1.1); }
-        }
-
-        .chat-panel {
-            position: absolute;
-            bottom: 72px;
-            right: 0;
-            width: 380px;
-            max-height: 560px;
-            background: var(--panel);
-            border: 1px solid var(--panel-border);
-            border-radius: 20px;
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            box-shadow: 0 24px 64px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.05);
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-            animation: slideUp 250ms ease;
-        }
-
-        @keyframes slideUp {
-            from { opacity: 0; transform: translateY(16px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        @media (max-width: 480px) {
-            .chat-panel {
-                width: calc(100vw - 32px);
-                max-height: 70vh;
-                bottom: 72px;
-                right: -12px;
-            }
-        }
-
-        .chat-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 16px 20px;
-            border-bottom: 1px solid var(--panel-border);
-            background: rgba(255, 255, 255, 0.02);
-        }
-
-        .chat-header-info {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .chat-avatar {
-            width: 36px;
-            height: 36px;
-            border-radius: 12px;
-            background: linear-gradient(135deg, var(--accent), var(--accent-2));
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #03111f;
-        }
-
-        .chat-title h4 {
-            margin: 0;
-            font-size: 0.95rem;
-            font-weight: 600;
-            color: var(--text);
-        }
-
-        .chat-status {
-            font-size: 0.7rem;
-            color: var(--accent);
-            text-transform: uppercase;
-            letter-spacing: 0.1em;
-        }
-
-        .chat-control-btn {
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            border: 1px solid var(--panel-border);
-            background: rgba(255, 255, 255, 0.04);
-            color: var(--muted);
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: background 180ms ease, color 180ms ease, border-color 180ms ease;
-        }
-
-        .chat-control-btn:hover {
-            background: rgba(255, 255, 255, 0.08);
-            color: var(--text);
-            border-color: rgba(255, 255, 255, 0.2);
-        }
-
-        .chat-messages {
-            flex: 1;
-            overflow-y: auto;
-            padding: 16px;
-            display: flex;
-            flex-direction: column;
-            gap: 14px;
-            min-height: 200px;
-        }
-
-        .message {
-            display: flex;
-            gap: 10px;
-            animation: fadeIn 300ms ease;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(8px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .message-avatar {
-            width: 28px;
-            height: 28px;
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-shrink: 0;
-            margin-top: 2px;
-        }
-
-        .assistant-message .message-avatar {
-            background: linear-gradient(135deg, var(--accent), var(--accent-2));
-            color: #03111f;
-        }
-
-        .user-message .message-avatar {
-            background: rgba(109, 211, 255, 0.2);
-            color: var(--accent);
-            border: 1px solid rgba(109, 211, 255, 0.3);
-        }
-
-        .message-content {
-            flex: 1;
-            min-width: 0;
-        }
-
-        .message-text {
-            font-size: 0.9rem;
-            line-height: 1.6;
-            color: var(--text);
-            white-space: pre-wrap;
-            word-wrap: break-word;
-        }
-
-        .user-message .message-text {
-            background: rgba(109, 211, 255, 0.12);
-            padding: 10px 14px;
-            border-radius: 16px 16px 4px 16px;
-            border: 1px solid rgba(109, 211, 255, 0.2);
-            display: inline-block;
-            max-width: 85%;
-        }
-
-        .assistant-message .message-text {
-            background: rgba(255, 255, 255, 0.04);
-            padding: 10px 14px;
-            border-radius: 16px 16px 16px 4px;
-            border: 1px solid var(--panel-border);
-            display: inline-block;
-            max-width: 85%;
-        }
-
-        .message-time {
-            font-size: 0.65rem;
-            color: var(--muted);
-            margin-top: 4px;
-            opacity: 0.7;
-        }
-
-        .chat-input-area {
-            padding: 16px;
-            border-top: 1px solid var(--panel-border);
-            background: rgba(255, 255, 255, 0.02);
-        }
-
-        .chat-suggestions {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-            margin-bottom: 12px;
-        }
-
-        .suggestion-chip {
-            padding: 6px 12px;
-            border-radius: 999px;
-            border: 1px solid var(--panel-border);
-            background: rgba(255, 255, 255, 0.04);
-            color: var(--muted);
-            font-size: 0.75rem;
-            cursor: pointer;
-            transition: all 180ms ease;
-            white-space: nowrap;
-        }
-
-        .suggestion-chip:hover {
-            border-color: var(--accent);
-            color: var(--accent);
-            background: rgba(109, 211, 255, 0.1);
-        }
-
-        .chat-form {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .chat-input {
-            flex: 1;
-            padding: 12px 16px;
-            border-radius: 999px;
-            border: 1px solid var(--panel-border);
-            background: rgba(255, 255, 255, 0.04);
-            color: var(--text);
-            font-size: 0.9rem;
-            font-family: inherit;
-            outline: none;
-            transition: border-color 180ms ease, background 180ms ease, box-shadow 180ms ease;
-        }
-
-        .chat-input:focus {
-            border-color: var(--accent);
-            background: rgba(255, 255, 255, 0.06);
-            box-shadow: 0 0 0 3px rgba(109, 211, 255, 0.15);
-        }
-
-        .chat-input::placeholder {
-            color: var(--muted);
-            opacity: 0.6;
-        }
-
-        .chat-input:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-
-        .chat-send-btn,
-        .chat-stop-btn {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            border: none;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: transform 180ms ease, background 180ms ease;
-            flex-shrink: 0;
-        }
-
-        .chat-send-btn {
-            background: linear-gradient(135deg, var(--accent), var(--accent-2));
-            color: #03111f;
-        }
-
-        .chat-send-btn:hover:not(:disabled) {
-            transform: scale(1.05);
-        }
-
-        .chat-send-btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-
-        .chat-stop-btn {
-            background: rgba(255, 80, 80, 0.2);
-            color: #ff5050;
-            border: 1px solid rgba(255, 80, 80, 0.3);
-        }
-
-        .chat-stop-btn:hover {
-            background: rgba(255, 80, 80, 0.3);
-            transform: scale(1.05);
-        }
-
-        /* Scrollbar styling for chat messages */
-        .chat-messages::-webkit-scrollbar {
-            width: 6px;
-        }
-
-        .chat-messages::-webkit-scrollbar-track {
-            background: transparent;
-        }
-
-        .chat-messages::-webkit-scrollbar-thumb {
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 3px;
-        }
-
-        .chat-messages::-webkit-scrollbar-thumb:hover {
-            background: rgba(255, 255, 255, 0.2);
-        }
-
-        /* RAG Chatbot Illustration Card */
-        .rag-chatbot-card {
-            display: grid;
-            grid-template-columns: 280px 1fr;
-            gap: 24px;
-            padding: 24px;
-            border-radius: 24px;
-            background: linear-gradient(135deg, rgba(109, 211, 255, 0.08), rgba(164, 139, 255, 0.08));
-            border: 1px solid rgba(109, 211, 255, 0.2);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            cursor: pointer;
-            transition: transform 250ms ease, border-color 250ms ease, box-shadow 250ms ease, background 250ms ease;
-            position: relative;
-            overflow: hidden;
-            min-height: 280px;
-        }
-
-        .rag-chatbot-card::before {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background: linear-gradient(135deg, rgba(109, 211, 255, 0.05), rgba(164, 139, 255, 0.05));
-            opacity: 0;
-            transition: opacity 250ms ease;
-        }
-
-        .rag-chatbot-card:hover {
-            transform: translateY(-4px);
-            border-color: rgba(109, 211, 255, 0.5);
-            box-shadow: 0 20px 50px rgba(109, 211, 255, 0.15), 0 0 0 1px rgba(109, 211, 255, 0.2);
-        }
-
-        .rag-chatbot-card:hover::before {
-            opacity: 1;
-        }
-
-        .rag-chatbot-card:focus-visible {
-            outline: none;
-            border-color: rgba(109, 211, 255, 0.6);
-            box-shadow: 0 0 0 3px rgba(109, 211, 255, 0.2);
-        }
-
-        .rag-illustration {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            position: relative;
-        }
-
-        .chatbot-svg {
-            width: 100%;
-            max-width: 280px;
-            height: auto;
-            filter: drop-shadow(0 10px 30px rgba(109, 211, 255, 0.15));
-        }
-
-        .rag-chatbot-info {
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            padding: 8px 0;
-        }
-
-        .rag-chatbot-info h3 {
-            margin: 0 0 12px;
-            font-size: 1.4rem;
-            font-weight: 700;
-            background: linear-gradient(135deg, var(--text), var(--accent));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .rag-chatbot-info p {
-            margin: 0 0 20px;
-            color: var(--muted);
-            line-height: 1.7;
-            font-size: 0.95rem;
-        }
-
-        .rag-features {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-        }
-
-        .feature-tag {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            padding: 8px 14px;
-            border-radius: 999px;
-            background: rgba(255, 255, 255, 0.04);
-            border: 1px solid rgba(109, 211, 255, 0.2);
-            color: var(--accent);
-            font-size: 0.78rem;
-            font-weight: 600;
-            transition: all 180ms ease;
-        }
-
-        .feature-tag:hover {
-            background: rgba(109, 211, 255, 0.12);
-            border-color: var(--accent);
-            transform: translateY(-1px);
-        }
-
-        .feature-tag svg {
-            flex-shrink: 0;
-        }
-
-        /* SVG Animations */
-        .bot-eyes ellipse:nth-child(2),
-        .bot-eyes ellipse:nth-child(5) {
-            animation: eyeGlow 3s ease-in-out infinite;
-        }
-
-        .bot-eyes ellipse:nth-child(3),
-        .bot-eyes ellipse:nth-child(6) {
-            animation: eyePupil 3s ease-in-out infinite;
-        }
-
-        @keyframes eyeGlow {
-            0%, 100% { filter: drop-shadow(0 0 4px #6dd3ff); }
-            50% { filter: drop-shadow(0 0 12px #6dd3ff) drop-shadow(0 0 20px #a48bff); }
-        }
-
-        @keyframes eyePupil {
-            0%, 100% { transform: translate(0, 0); }
-            25% { transform: translate(2px, 0); }
-            75% { transform: translate(-2px, 0); }
-        }
-
-        .mouth-bar {
-            animation: mouthWave 1.5s ease-in-out infinite;
-            transform-origin: center;
-        }
-
-        .bar1 { animation-delay: 0s; }
-        .bar2 { animation-delay: 0.1s; }
-        .bar3 { animation-delay: 0.2s; }
-        .bar4 { animation-delay: 0.3s; }
-
-        @keyframes mouthWave {
-            0%, 100% { transform: scaleY(0.5); }
-            50% { transform: scaleY(1.2); }
-        }
-
-        .brain-core {
-            animation: brainPulse 2.5s ease-in-out infinite;
-        }
-
-        @keyframes brainPulse {
-            0%, 100% { r: 22; filter: drop-shadow(0 0 8px #6dd3ff); }
-            50% { r: 24; filter: drop-shadow(0 0 20px #6dd3ff) drop-shadow(0 0 30px #a48bff); }
-        }
-
-        .connections {
-            animation: connFlow 3s linear infinite;
-        }
-
-        @keyframes connFlow {
-            0% { stroke-dashoffset: 0; opacity: 0.3; }
-            100% { stroke-dashoffset: 16; opacity: 0.7; }
-        }
-
-        .click-hint {
-            animation: hintPulse 1.5s ease-in-out infinite;
-        }
-
-        @keyframes hintPulse {
-            0%, 100% { opacity: 0.7; filter: drop-shadow(0 0 8px #00ff88); }
-            50% { opacity: 1; filter: drop-shadow(0 0 16px #00ff88) drop-shadow(0 0 28px #00ff88); }
-        }
-
-        @media (max-width: 1000px) {
-            .rag-chatbot-card {
-                grid-template-columns: 1fr;
-                grid-template-rows: auto 1fr;
-                text-align: center;
-                min-height: auto;
-            }
-
-            .rag-illustration {
-                order: 1;
-            }
-
-            .rag-chatbot-info {
-                order: 2;
-                padding: 16px 0 0;
-            }
-
-            .rag-chatbot-info h3 {
-                font-size: 1.25rem;
-            }
-
-            .rag-features {
-                justify-content: center;
-            }
-
-            .chatbot-svg {
-                max-width: 260px;
-            }
-        }
-
-        @media (max-width: 640px) {
-            .rag-chatbot-card {
-                padding: 20px;
-                border-radius: 20px;
-            }
-
-            .chatbot-svg {
-                max-width: 240px;
-            }
-
-            .rag-chatbot-info h3 {
-                font-size: 1.1rem;
-            }
-
-            .rag-chatbot-info p {
-                font-size: 0.9rem;
-            }
-
-            .feature-tag {
-                padding: 6px 12px;
-                font-size: 0.72rem;
-            }
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Salahuddin Muhammad builds practical AI agents, automation workflows, and human-AI systems that connect instructions to real work.">
+  <meta name="theme-color" content="#101513">
+  <meta property="og:title" content="Salahuddin Muhammad | Practical AI Systems">
+  <meta property="og:description" content="AI agents, remote task delegation, and automation experiments grounded in real software work.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://portfolio-3d-opal-six.vercel.app/">
+  <meta name="twitter:card" content="summary">
+  <link rel="canonical" href="https://portfolio-3d-opal-six.vercel.app/">
+  <link rel="icon" href="data:,">
+  <title>Salahuddin Muhammad | Practical AI Systems</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Space+Grotesk:wght@400;500;600;700&display=swap');
+
+    :root {
+      color-scheme: dark;
+      --ink: #f2f1e9;
+      --muted: #a9b0a7;
+      --dim: #6e776e;
+      --bg: #101513;
+      --panel: rgba(23, 31, 28, .78);
+      --panel-solid: #18221e;
+      --line: rgba(226, 234, 216, .14);
+      --lime: #c4eb77;
+      --orange: #f19b5b;
+      --blue: #91c7d4;
+      --mono: 'DM Mono', Consolas, monospace;
+      --display: 'Space Grotesk', 'Segoe UI', sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; scroll-padding-top: 90px; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: var(--display);
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      z-index: -2;
+      background: radial-gradient(circle at 78% 4%, rgba(196,235,119,.11), transparent 29%), radial-gradient(circle at 12% 40%, rgba(145,199,212,.06), transparent 25%), linear-gradient(115deg, #101513 0%, #131a16 55%, #0c100e 100%);
+    }
+    body::after {
+      content: '';
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      opacity: .24;
+      pointer-events: none;
+      background-image: linear-gradient(rgba(255,255,255,.025) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.025) 1px, transparent 1px);
+      background-size: 56px 56px;
+      mask-image: linear-gradient(to bottom, black, transparent 80%);
+    }
+    a { color: inherit; text-decoration: none; }
+    button, a { -webkit-tap-highlight-color: transparent; }
+    :focus-visible { outline: 2px solid var(--lime); outline-offset: 4px; }
+    .site-header, main, .site-footer { width: min(1180px, calc(100% - 40px)); margin: 0 auto; }
+    .site-header { min-height: 78px; display: flex; align-items: center; justify-content: space-between; gap: 24px; position: sticky; top: 0; z-index: 10; background: rgba(16,21,19,.82); backdrop-filter: blur(18px); border-bottom: 1px solid var(--line); }
+    .brand { display: flex; align-items: center; gap: 11px; font-size: .86rem; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; white-space: nowrap; }
+    .brand-mark { width: 10px; height: 10px; background: var(--lime); box-shadow: 0 0 20px rgba(196,235,119,.7); }
+    nav { display: flex; align-items: center; gap: 24px; color: var(--muted); font-size: .88rem; }
+    nav a { transition: color .2s ease; }
+    nav a:hover { color: var(--lime); }
+    .menu-toggle { display: none; border: 1px solid var(--line); background: transparent; color: var(--ink); padding: 9px 12px; font: 500 .78rem var(--mono); }
+    .eyebrow, .section-label, .mono { font-family: var(--mono); text-transform: uppercase; letter-spacing: .12em; }
+    .eyebrow, .section-label { color: var(--lime); font-size: .72rem; }
+    .hero { min-height: calc(100vh - 78px); display: grid; grid-template-columns: minmax(0, 1.12fr) minmax(320px, .88fr); align-items: center; gap: 60px; padding: 84px 0 110px; position: relative; }
+    .hero-copy { position: relative; z-index: 1; }
+    .hero h1 { max-width: 760px; margin: 20px 0 26px; font-size: clamp(3rem, 7vw, 6.7rem); line-height: .92; letter-spacing: -.07em; font-weight: 600; }
+    .hero h1 em { color: var(--lime); font-style: normal; }
+    .hero-lede { max-width: 590px; color: var(--muted); font-size: 1.14rem; line-height: 1.7; margin: 0 0 30px; }
+    .actions, .link-row { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
+    .button { display: inline-flex; align-items: center; gap: 10px; padding: 13px 17px; border: 1px solid var(--line); font-size: .9rem; font-weight: 600; transition: transform .2s ease, border-color .2s ease, background .2s ease; }
+    .button:hover { transform: translateY(-2px); border-color: var(--lime); }
+    .button.primary { color: #16200f; background: var(--lime); border-color: var(--lime); }
+    .button.secondary { background: rgba(255,255,255,.035); }
+    .text-link { color: var(--lime); font: 500 .78rem var(--mono); text-transform: uppercase; letter-spacing: .09em; }
+    .hero-visual { min-height: 440px; border: 1px solid var(--line); background: linear-gradient(145deg, rgba(196,235,119,.08), rgba(145,199,212,.03) 46%, rgba(0,0,0,.14)); position: relative; overflow: hidden; }
+    #scene { position: absolute; inset: 0; }
+    .visual-caption { position: absolute; left: 22px; right: 22px; bottom: 20px; display: flex; justify-content: space-between; gap: 16px; color: var(--muted); font: .7rem var(--mono); text-transform: uppercase; letter-spacing: .08em; }
+    .hero-note { position: absolute; top: 16px; right: 16px; border: 1px solid rgba(196,235,119,.3); color: var(--lime); padding: 8px 10px; font: .68rem var(--mono); }
+    .signal { display: flex; align-items: center; gap: 8px; margin-top: 38px; color: var(--dim); font: .72rem var(--mono); text-transform: uppercase; }
+    .signal i { width: 7px; height: 7px; border-radius: 50%; background: var(--orange); box-shadow: 0 0 14px var(--orange); }
+    section { padding: 110px 0; border-top: 1px solid var(--line); }
+    .section-intro { display: grid; grid-template-columns: .45fr 1fr; gap: 42px; margin-bottom: 42px; }
+    h2 { max-width: 660px; margin: 0; font-size: clamp(2rem, 4vw, 4rem); line-height: .98; letter-spacing: -.055em; font-weight: 500; }
+    .intro-copy { max-width: 650px; color: var(--muted); line-height: 1.8; font-size: 1rem; }
+    .intro-copy p { margin: 0 0 16px; }
+    .feature { padding: 34px; border: 1px solid rgba(196,235,119,.3); background: linear-gradient(135deg, rgba(196,235,119,.09), rgba(24,34,30,.68) 42%); }
+    .feature-top { display: flex; justify-content: space-between; gap: 24px; align-items: start; margin-bottom: 34px; }
+    .feature h3 { max-width: 640px; margin: 10px 0 14px; font-size: clamp(1.7rem, 3vw, 3rem); line-height: 1; letter-spacing: -.05em; }
+    .feature p { max-width: 680px; color: var(--muted); line-height: 1.75; margin: 0; }
+    .status { flex: 0 0 auto; color: var(--lime); border: 1px solid rgba(196,235,119,.35); padding: 8px 10px; font: .68rem var(--mono); text-transform: uppercase; }
+    .flow { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px; background: var(--line); border: 1px solid var(--line); }
+    .flow-step { min-height: 166px; padding: 20px; background: rgba(16,21,19,.8); position: relative; }
+    .flow-step:not(:last-child)::after { content: '->'; position: absolute; top: 20px; right: -17px; z-index: 1; color: var(--lime); background: var(--panel-solid); padding: 0 4px; font-family: var(--mono); }
+    .flow-step b { display: block; margin-bottom: 30px; color: var(--orange); font: .7rem var(--mono); letter-spacing: .08em; }
+    .flow-step h4 { margin: 0 0 9px; font-size: 1.05rem; }
+    .flow-step p { margin: 0; color: var(--muted); font-size: .87rem; line-height: 1.6; }
+    .quote-grid { display: grid; grid-template-columns: 1.2fr .8fr; gap: 16px; margin-top: 16px; }
+    .quote-box, .result-box { padding: 22px; border: 1px solid var(--line); background: rgba(255,255,255,.025); }
+    .quote-box span, .result-box span { display: block; color: var(--dim); margin-bottom: 12px; font: .68rem var(--mono); text-transform: uppercase; }
+    blockquote { margin: 0; font-size: 1.1rem; line-height: 1.6; }
+    .result-box code { color: var(--lime); font: 500 1rem var(--mono); overflow-wrap: anywhere; }
+    .proof-note { margin: 26px 0 0; color: var(--muted); font-size: .86rem; line-height: 1.65; }
+    .cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+    .card { min-height: 245px; padding: 24px; border: 1px solid var(--line); background: rgba(255,255,255,.025); transition: border-color .2s ease, transform .2s ease; }
+    .card:hover { transform: translateY(-3px); border-color: rgba(196,235,119,.55); }
+    .card-index { color: var(--orange); font: .72rem var(--mono); }
+    .card h3 { margin: 42px 0 12px; font-size: 1.15rem; }
+    .card p { margin: 0; color: var(--muted); font-size: .92rem; line-height: 1.7; }
+    .project-list { display: grid; gap: 1px; background: var(--line); border: 1px solid var(--line); }
+    .project { display: grid; grid-template-columns: 1.1fr 1.8fr .8fr; gap: 28px; padding: 25px 22px; background: rgba(16,21,19,.86); align-items: start; }
+    .project h3 { margin: 0; font-size: 1.35rem; letter-spacing: -.03em; }
+    .project p { margin: 0; color: var(--muted); line-height: 1.65; font-size: .91rem; }
+    .project-meta { color: var(--dim); font: .7rem var(--mono); line-height: 1.8; text-transform: uppercase; }
+    .project.featured-project { background: rgba(196,235,119,.06); }
+    .skill-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .skill-group { padding: 22px; border-top: 2px solid var(--lime); background: rgba(255,255,255,.025); }
+    .skill-group h3 { margin: 0 0 18px; font-size: 1rem; }
+    .skill-group p { color: var(--muted); line-height: 1.8; margin: 0; }
+    .method { display: grid; grid-template-columns: repeat(5, 1fr); gap: 1px; border: 1px solid var(--line); background: var(--line); }
+    .method-item { min-height: 170px; padding: 20px; background: rgba(255,255,255,.025); }
+    .method-item b { color: var(--lime); font: .75rem var(--mono); }
+    .method-item h3 { margin: 36px 0 10px; font-size: 1rem; }
+    .method-item p { color: var(--muted); font-size: .84rem; line-height: 1.6; margin: 0; }
+    .contact { display: grid; grid-template-columns: 1fr .8fr; gap: 60px; align-items: end; }
+    .contact h2 { max-width: 550px; }
+    .contact-copy { color: var(--muted); line-height: 1.75; max-width: 480px; }
+    .contact-links { display: grid; gap: 12px; }
+    .contact-links a { display: flex; justify-content: space-between; align-items: center; padding: 15px 0; border-bottom: 1px solid var(--line); color: var(--ink); }
+    .contact-links a span { color: var(--lime); font: .7rem var(--mono); text-transform: uppercase; }
+    .site-footer { padding: 28px 0 44px; border-top: 1px solid var(--line); display: flex; justify-content: space-between; gap: 20px; color: var(--dim); font: .7rem var(--mono); text-transform: uppercase; letter-spacing: .06em; }
+    .reveal { opacity: 0; transform: translateY(18px); transition: opacity .7s ease, transform .7s ease; }
+    .reveal.visible { opacity: 1; transform: translateY(0); }
+    @media (max-width: 900px) { .hero { grid-template-columns: 1fr; gap: 38px; padding-top: 70px; } .hero-visual { min-height: 380px; } .section-intro, .contact { grid-template-columns: 1fr; gap: 20px; } .cards { grid-template-columns: repeat(2, 1fr); } .project { grid-template-columns: 1fr 1.7fr; } .project-meta { grid-column: 2; } .method { grid-template-columns: repeat(3, 1fr); } }
+    @media (max-width: 640px) { .site-header, main, .site-footer { width: min(100% - 28px, 1180px); } .site-header { min-height: 68px; } nav { display: none; position: absolute; top: 68px; left: 0; right: 0; flex-direction: column; align-items: stretch; padding: 16px; background: #18221e; border: 1px solid var(--line); } nav.open { display: flex; } nav a { padding: 8px 0; } .menu-toggle { display: block; } .hero { min-height: auto; padding: 72px 0 88px; } .hero h1 { font-size: clamp(3rem, 15vw, 4.7rem); } .hero-lede { font-size: 1rem; } .hero-visual { min-height: 310px; } section { padding: 78px 0; } .feature { padding: 20px; } .feature-top { flex-direction: column; margin-bottom: 22px; } .flow { grid-template-columns: 1fr; } .flow-step { min-height: 0; } .flow-step:not(:last-child)::after { content: '↓'; top: auto; right: 20px; bottom: -13px; } .quote-grid, .skill-layout { grid-template-columns: 1fr; } .cards, .method { grid-template-columns: 1fr; } .card { min-height: 0; } .card h3 { margin-top: 25px; } .project { grid-template-columns: 1fr; gap: 12px; } .project-meta { grid-column: auto; } .site-footer { flex-direction: column; } }
+    @media (prefers-reduced-motion: reduce) { *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; transition-duration: .01ms !important; } .reveal { opacity: 1; transform: none; } }
+  </style>
 </head>
 <body>
-    <div class="cursor-dot"></div>
-    <div class="cursor-ring"></div>
-    <div class="loading-screen" id="loadingScreen">
-        <div class="loader-box">
-            <div>Initializing experience</div>
-            <div class="loader-bar"><span></span></div>
-        </div>
-    </div>
-    <div id="scene"></div>
-    <div class="overlay">
-        <header class="topbar">
-            <div class="brand">Salahuddin Muhammad</div>
-            <nav class="nav-links">
-                <a href="#projects">Projects</a>
-                <a href="#about">About</a>
-                <a href="#whatsappConnectBtn">Contact</a>
-            </nav>
-        </header>
+  <header class="site-header">
+    <a class="brand" href="#top"><span class="brand-mark" aria-hidden="true"></span>Salahuddin Muhammad</a>
+    <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="site-nav">Menu</button>
+    <nav id="site-nav" aria-label="Primary navigation">
+      <a href="#about">About</a><a href="#work">AI work</a><a href="#skills">Skills</a><a href="#contact">Contact</a>
+    </nav>
+  </header>
 
-        <div class="hero-shell">
-            <div class="hero-ambient">S</div>
-            <main class="hero">
-                <section class="hero-copy reveal visible">
-                    <p class="eyebrow">Agentic AI & Autonomous Automation Developer</p>
-                    <h1>Building artificial intelligent systems that work alongside people.</h1>
-                    <p>I have hands-on experience working with technologies and platforms across the modern AI ecosystem, including <strong>AI agents, automation workflows, RAG chatbots, APIs, databases, cloud services, and developer tools</strong>.</p>
-                    <div class="hero-actions">
-                        <a class="btn primary" href="#projects">Explore portfolio</a>
-                        <a class="btn secondary" href="#whatsappConnectBtn">Connect with me</a>
-                    </div>
-                    <div id="socialLinks" class="social-links"></div>
-                </section>
-            </main>
-                    </div>
+  <main id="top">
+    <section class="hero" aria-labelledby="hero-title">
+      <div class="hero-copy">
+        <div class="eyebrow">AI systems / agentic workflows / practical automation</div>
+        <h1 id="hero-title">Building AI agents that <em>do</em> useful work.</h1>
+        <p class="hero-lede">I explore how natural-language instructions can become real software, automation, and computer actions. My work sits where AI agents meet the tools people already use.</p>
+        <div class="actions"><a class="button primary" href="#work">Explore the work <span aria-hidden="true">-&gt;</span></a><a class="button secondary" href="#contact">Start a conversation</a></div>
+        <div class="signal"><i aria-hidden="true"></i> Building honestly, testing in the real world</div>
+      </div>
+      <div class="hero-visual" aria-label="Animated Three.js agent workflow visualization">
+        <div id="scene"></div><div class="hero-note">Live system sketch</div>
+        <div class="visual-caption"><span>Human input</span><span>Agent action</span><span>Verified result</span></div>
+      </div>
+    </section>
 
-        <section id="projects" class="section">
-            <div class="section-card reveal">
-                <div class="section-heading">
-                    <div>
-                        <h1>My 24/7 Autonomous AI Digital Employee</h1>
-                        <p>Agentic AI • Autonomous Agents • AI Automation • Remote Task Delegation</p>
-                    </div>
-                </div>
-                <div class="service-card" style="background:rgba(255,255,255,0.04);border:none;box-shadow:none;">
-                    <h2>I Built an AI Employee That Works for Me — From Anywhere</h2>
-                    <p>I built a personal autonomous AI employee that allows me to delegate tasks remotely through WhatsApp and Discord. Even when I am travelling without my laptop, I can simply use my mobile phone to communicate with my AI agent, assign tasks in natural language, and receive updates when the work is completed.</p>
-                    <p><strong>I don't just use AI. I delegate work to AI agents.</strong></p>
-                    <hr />
-                    <h2>The Challenge</h2>
-                    <p>Traditional AI workflows often require me to be in front of my computer to interact with AI tools, write code, manage projects, and perform tasks.</p>
-                    <p>I wanted to go beyond simply chatting with AI.</p>
-                    <p>I wanted an AI agent that could act as my <strong>digital employee</strong>—one that I could communicate with remotely, delegate work to, and allow to execute tasks on my behalf.</p>
-                    <hr />
-                    <h2>My Solution</h2>
-                    <p>I built a remotely accessible <strong>Agentic AI system</strong> powered by OpenClaw and connected it with communication platforms such as WhatsApp and Discord.</p>
-                    <p>Now, my mobile phone becomes my remote control for my AI employee.</p>
-                    <p>Whether I am at home, travelling, or away from my laptop, I can send my agent a task through my mobile phone. My agent receives my instructions, performs the assigned work using its available tools and capabilities, and informs me when the task is completed.</p>
-                    <div class="remote-delegation reveal">
-                        <div class="remote-delegation-header">
-                            <div>
-                                <p class="remote-delegation-kicker">New capability · practical agentic AI</p>
-                                <h2>Remote AI Task Delegation</h2>
-                                <p class="remote-delegation-intro">I have built a practical AI digital employee: a connected agent that can receive a delegated task remotely and carry out an approved action on my computer. This moves beyond a chatbot that only explains what to do.</p>
-                            </div>
-                            <span class="remote-delegation-badge">Demonstrated workflow</span>
-                        </div>
-                        <div class="remote-flow" aria-label="Remote task delegation workflow">
-                            <article class="remote-flow-step">
-                                <span class="remote-flow-number">01 · MOBILE</span>
-                                <h3>Send the task</h3>
-                                <p>I send a natural-language request through ChatGPT and OpenAI Codex while away from my laptop.</p>
-                            </article>
-                            <article class="remote-flow-step">
-                                <span class="remote-flow-number">02 · AI AGENT</span>
-                                <h3>Interpret and act</h3>
-                                <p>The connected agent receives the instruction and uses its available computer capabilities to perform it.</p>
-                            </article>
-                            <article class="remote-flow-step">
-                                <span class="remote-flow-number">03 · LAPTOP</span>
-                                <h3>Make the change</h3>
-                                <p>The requested action happens on my laptop, even though I am not physically at the keyboard.</p>
-                            </article>
-                            <article class="remote-flow-step">
-                                <span class="remote-flow-number">04 · RESULT</span>
-                                <h3>Verify the outcome</h3>
-                                <p>I can return later and find the completed result on the computer.</p>
-                            </article>
-                        </div>
-                        <div class="remote-example">
-                            <div class="remote-example-panel">
-                                <span class="remote-example-label">From my mobile</span>
-                                <blockquote>"Create a folder named myownfolder on my laptop Desktop."</blockquote>
-                            </div>
-                            <div class="remote-example-panel">
-                                <span class="remote-example-label">Observed result</span>
-                                <code>Desktop/myownfolder</code>
-                            </div>
-                        </div>
-                        <p class="remote-delegation-note"><strong>Why it matters:</strong> I am experimenting with AI agents that can move beyond conversation and perform useful, bounded actions on a real computer. This is one step toward a dependable AI digital employee, not a claim of unlimited autonomy.</p>
-                    </div>
-                    <hr />
-                    <h2>How My AI Employee Works</h2>
-                    <p><strong>1. I Give an Instruction</strong><br />I send a natural-language request to my AI agent through WhatsApp or Discord.</p>
-                    <p><strong>2. My AI Agent Receives the Task</strong><br />The agent understands my request and determines what needs to be done.</p>
-                    <p><strong>3. The Agent Executes the Work</strong><br />My AI employee performs the assigned task using its connected tools, systems, and capabilities.</p>
-                    <p><strong>4. I Continue My Day</strong><br />I don't need to remain in front of my laptop while the task is being handled.</p>
-                    <p><strong>5. I Receive the Result</strong><br />Once the work is completed, my AI agent reports back to me through my communication channel.</p>
-                    <h3>My Workflow</h3>
-                    <p>📱 Mobile Phone → 💬 WhatsApp / Discord → 🤖 OpenClaw AI Agent → 🧠 Autonomous Task Execution → 🛠️ Connected Tools & Systems → ✅ Task Completed → 📩 Completion Report</p>
-                    <hr />
-                    <h2>A Real-World Example</h2>
-                    <p>While travelling away from home without my laptop, I needed my AI agent to work on a project.</p>
-                    <p>Instead of waiting until I returned home, I simply opened WhatsApp on my mobile phone and sent my instructions to my AI employee.</p>
-                    <p>The agent received my request, carried out the assigned work, and informed me when the task was completed.</p>
-                    <blockquote><strong>My AI employee can continue working for me even when I am not physically present at my computer.</strong></blockquote>
-                    <hr />
-                    <h2>Key Achievements</h2>
-                    <ul>
-                        <li>🌍 Work From Anywhere — Delegate tasks to my AI agent from virtually anywhere using my mobile phone.</li>
-                        <li>🤖 24/7 Digital Employee — My AI agent is designed to be available whenever I need to delegate work.</li>
-                        <li>💬 Natural Language Interaction — Communicate with my AI employee conversationally instead of manually operating every step.</li>
-                        <li>⚙️ Autonomous Task Execution — The agent can take instructions and perform assigned tasks using its connected capabilities.</li>
-                        <li>📲 Mobile-First Control — Use WhatsApp and Discord as remote communication channels for my AI employee.</li>
-                        <li>🔄 Task Completion Feedback — Receive updates and completion notifications after assigned work is finished.</li>
-                        <li>🧠 Practical Agentic AI Experience — Demonstrates my hands-on experience building and using AI systems that go beyond simple chat and can act on delegated tasks.</li>
-                    </ul>
-                    <hr />
-                    <h2>Technology & Integrations</h2>
-                    <p><strong>OpenClaw</strong>, <strong>Agentic AI</strong>, <strong>Autonomous AI Agents</strong>, <strong>WhatsApp Integration</strong>, <strong>Discord Integration</strong>, <strong>AI Model Integration</strong>, <strong>Task Automation</strong>, <strong>Remote AI Interaction</strong>, <strong>Tool-Based AI Workflows</strong></p>
-                    <hr />
-                    <h2>Why This Project Matters</h2>
-                    <p>This project represents my practical journey from <strong>using AI as a tool</strong> to <strong>building systems where AI can act as an autonomous digital worker</strong>.</p>
-                    <p>My goal is not simply to ask AI questions.</p>
-                    <p>My goal is to build intelligent AI agents that can: <strong>Understand → Plan → Act → Execute → Report</strong></p>
-                    <p>This is my hands-on experience with the future of <strong>Agentic AI and AI-powered digital employees</strong>.</p>
-                    <hr />
-                    <h2>My Vision</h2>
-                    <p>I am continuing to evolve my AI employee into a more capable personal AI workforce where specialized agents can assist with software development, research, content creation, project management, business operations, monitoring, and other repetitive or complex tasks.</p>
-                    <h3>The vision is simple:</h3>
-                    <blockquote><strong>I give the instruction. My AI workforce gets the work done.</strong></blockquote>
-                    <hr />
-                    <p><strong>🚀 Explore My Agentic AI Journey</strong> <a class="project-link" href="/movie-video.mp4" target="_blank" rel="noreferrer">Watch My AI Employee in Action</a></p>
-                </div>
-            </div>
-        </section>
+    <section id="about" class="reveal">
+      <div class="section-intro"><div class="section-label">01 / Point of view</div><div class="intro-copy"><h2>Beyond asking AI questions.</h2><p>I am Salahuddin Muhammad, an AI automation and agentic-AI builder focused on practical experiments. I like the moment a system stops being a demo and starts handling a bounded piece of real work.</p><p>That means connecting agents to software, files, developer environments, and human workflows, then being precise about what happened and what still needs improvement.</p></div></div>
+      <div class="cards"><article class="card"><span class="card-index">01</span><h3>AI agents</h3><p>Systems that receive an instruction, interpret context, and use available tools to move a task forward.</p></article><article class="card"><span class="card-index">02</span><h3>Automation</h3><p>Workflows that reduce repetitive effort while keeping humans in the loop where judgment and approval matter.</p></article><article class="card"><span class="card-index">03</span><h3>Digital employees</h3><p>An evolving direction: delegated software work that can execute, verify, and report back while the human is away.</p></article></div>
+    </section>
 
-        <section id="about" class="section">
-            <div class="section-card reveal">
-                <div class="info-grid">
-                    <div class="info-card">
-                        <h3>About me</h3>
-                        <p>I’m <strong>Salahuddin Muhammad</strong>, an aspiring <strong>AI Automation & Agentic AI Developer</strong> passionate about building intelligent systems, AI agents, RAG chatbots, and automation solutions that solve real-world problems. I’m dedicated to continuously learning, exploring emerging technologies, and transforming innovative ideas into practical, impactful AI solutions.</p>
-                    </div>
-                </div>
-            </div>
-            <div class="section-card reveal">
-                <div class="section-heading">
-                    <div>
-                        <h2>What I Do</h2>
-                        <p>AI-driven solutions and automation services that help products move faster, smarter, and more beautifully.</p>
-                    </div>
-                </div>
-                <div class="service-grid">
-                    <article class="service-card">
-                        <h3>Agentic AI Development</h3>
-                        <p>Designing autonomous agents that understand tasks, adapt to context, and deliver outcomes with minimal oversight.</p>
-                    </article>
-                    <article class="service-card">
-                        <h3>AI Automation</h3>
-                        <p>Automating workflows, data operations, and decision-making with intelligent systems that reduce manual effort.</p>
-                    </article>
-                    <article class="service-card">
-                        <h3>RAG Chatbots</h3>
-                        <p>Building retrieval-augmented chatbots that answer questions with accurate, up-to-date knowledge from real sources.</p>
-                    </article>
-                    <article class="service-card">
-                        <h3>Personal AI Employees</h3>
-                        <p>Crafting AI copilots and virtual assistants that extend teams and improve productivity across roles.</p>
-                    </article>
-                    <article class="service-card">
-                        <h3>API Integration</h3>
-                        <p>Connecting modern APIs, data platforms, and AI services into seamless, composable digital products.</p>
-                    </article>
-                    <article class="service-card">
-                        <h3>AI-Powered Solutions</h3>
-                        <p>Delivering user experiences enriched by machine intelligence, personalization, and scalable automation.</p>
-                    </article>
-                </div>
-            </div>
-        </section>
+    <section id="work" class="reveal">
+      <div class="section-intro"><div class="section-label">02 / Featured case study</div><div class="intro-copy"><h2>Remote AI Task Delegation</h2><p>A concrete experiment in the larger idea of an AI digital employee: mobile instruction, connected agent, real laptop action.</p></div></div>
+      <article class="feature">
+        <div class="feature-top"><div><div class="eyebrow">From a mobile instruction to a real computer action</div><h3>Human gives a task. The agent carries it to the laptop.</h3><p>I integrated OpenAI Codex with my laptop so I can send a bounded development or computer task remotely while away from the machine. The demonstrated example is simple by design: create a folder named <strong>myownfolder</strong> on the laptop Desktop.</p></div><span class="status">Demonstrated workflow</span></div>
+        <div class="flow" aria-label="Remote AI task delegation steps"><div class="flow-step"><b>01 / MOBILE</b><h4>Send the task</h4><p>A natural-language instruction starts the workflow from a mobile device.</p></div><div class="flow-step"><b>02 / AI AGENT</b><h4>Interpret and plan</h4><p>ChatGPT and Codex process the request and determine the appropriate action.</p></div><div class="flow-step"><b>03 / LAPTOP</b><h4>Execute the action</h4><p>The connected coding agent performs the approved task in the computer environment.</p></div><div class="flow-step"><b>04 / RESULT</b><h4>Find the outcome</h4><p>The requested folder exists on the laptop when I return and verify the result.</p></div></div>
+        <div class="quote-grid"><div class="quote-box"><span>Example instruction</span><blockquote>"Create a folder named myownfolder on my laptop Desktop."</blockquote></div><div class="result-box"><span>Observed result</span><code>Desktop/myownfolder</code></div></div>
+        <p class="proof-note"><strong>What this proves:</strong> a bounded remote task can cross from mobile input to a real computer action. <strong>What it does not claim:</strong> unlimited computer control, full autonomy, or AGI. This is one working experiment in a larger direction.</p>
+      </article>
+    </section>
 
-        <section id="contact" class="section">
-            <div class="section-card reveal">
-                <div class="section-heading">
-                    <div>
-                        <h2>Chat with My AI Assistant</h2>
-                        <p>Ask me anything about my projects, skills, experience, or how to collaborate.</p>
-                    </div>
-                </div>
+    <section class="reveal" aria-labelledby="vision-title"><div class="section-intro"><div class="section-label">03 / Direction</div><div class="intro-copy"><h2 id="vision-title">My AI digital employee vision.</h2><p>The long-term system I am exploring is simple enough to explain and difficult enough to keep building:</p></div></div><div class="feature"><div class="flow"><div class="flow-step"><b>01</b><h4>Human gives a task</h4><p>Intent arrives in natural language.</p></div><div class="flow-step"><b>02</b><h4>AI plans</h4><p>The agent selects a path using available context and tools.</p></div><div class="flow-step"><b>03</b><h4>AI executes</h4><p>Useful, bounded work happens in the connected environment.</p></div><div class="flow-step"><b>04</b><h4>AI verifies and reports</h4><p>The result comes back for review, iteration, or approval.</p></div></div></div></section>
 
-                <!-- RAG Chatbot Illustration Card -->
-                <div class="rag-chatbot-card" id="rag-chatbot-trigger" role="button" tabindex="0" aria-label="Open AI chat assistant">
-                    <div class="rag-illustration">
-                        <svg class="chatbot-svg" viewBox="0 0 320 280" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                            <!-- Background glow -->
-                            <defs>
-                                <radialGradient id="botGlow" cx="50%" cy="30%" r="70%">
-                                    <stop offset="0%" stop-color="#6dd3ff" stop-opacity="0.15"/>
-                                    <stop offset="100%" stop-color="#6dd3ff" stop-opacity="0"/>
-                                </radialGradient>
-                                <linearGradient id="accentGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                                    <stop offset="0%" stop-color="#6dd3ff"/>
-                                    <stop offset="100%" stop-color="#a48bff"/>
-                                </linearGradient>
-                                <linearGradient id="panelGrad" x1="0%" y1="0%" x2="0%" y2="100%">
-                                    <stop offset="0%" stop-color="rgba(255,255,255,0.08)"/>
-                                    <stop offset="100%" stop-color="rgba(255,255,255,0.02)"/>
-                                </linearGradient>
-                            </defs>
+    <section class="reveal" aria-labelledby="projects-title"><div class="section-intro"><div class="section-label">04 / Selected work</div><div class="intro-copy"><h2 id="projects-title">Proof over buzzwords.</h2><p>These projects show the surfaces I am actively exploring, with the technology and level of completion kept visible.</p></div></div><div class="project-list"><article class="project featured-project"><h3>Remote AI Task Delegation</h3><p>A mobile-to-laptop workflow using ChatGPT/Codex to execute a bounded computer task. The folder-creation example is demonstrated; the broader digital-employee concept remains in progress.</p><div class="project-meta">AI agents<br>OpenAI Codex<br>Computer automation</div></article><article class="project"><h3>3D Portfolio Experience</h3><p>This site is also an experiment: a Three.js scene gives the portfolio a living system backdrop without replacing the content, navigation, or accessible HTML.</p><div class="project-meta">Three.js<br>WebGL<br>Static deployment</div></article><article class="project"><h3>RAG Portfolio Assistant</h3><p>A lightweight portfolio chatbot backed by a serverless keyword-retrieval endpoint. It answers from a small, explicit knowledge base rather than pretending to know more than the site contains.</p><div class="project-meta">JavaScript<br>Serverless API<br>Retrieval</div></article></div></section>
 
-                            <!-- Outer glow -->
-                            <ellipse cx="160" cy="260" rx="140" ry="30" fill="url(#botGlow)"/>
+    <section id="skills" class="reveal" aria-labelledby="skills-title"><div class="section-intro"><div class="section-label">05 / Skills and tools</div><div class="intro-copy"><h2 id="skills-title">A practical stack for connected systems.</h2><p>Organized around the work shown here, rather than a long list of unverified technologies.</p></div></div><div class="skill-layout"><div class="skill-group"><h3>AI and agents</h3><p>Agentic AI &middot; AI automation &middot; LLM workflows &middot; RAG chatbots &middot; AI-assisted development</p></div><div class="skill-group"><h3>Development</h3><p>JavaScript &middot; HTML &middot; CSS &middot; Three.js &middot; WebGL &middot; Serverless JavaScript APIs</p></div><div class="skill-group"><h3>Tools and platforms</h3><p>OpenAI Codex &middot; ChatGPT &middot; OpenClaw &middot; WhatsApp &middot; Discord &middot; GitHub &middot; Vercel</p></div><div class="skill-group"><h3>Systems thinking</h3><p>Remote task delegation &middot; human-AI collaboration &middot; tool-based workflows &middot; verification and reporting</p></div></div></section>
 
-                            <!-- Chatbot body -->
-                            <rect x="50" y="40" width="220" height="200" rx="24" fill="url(#panelGrad)" stroke="rgba(109,211,255,0.3)" stroke-width="1.5"/>
+    <section class="reveal" aria-labelledby="method-title"><div class="section-intro"><div class="section-label">06 / How I work</div><div class="intro-copy"><h2 id="method-title">Build the loop. Test the claim.</h2></div></div><div class="method"><div class="method-item"><b>01</b><h3>Understand</h3><p>Start with the real task and its constraints.</p></div><div class="method-item"><b>02</b><h3>Design</h3><p>Map the human and agent responsibilities.</p></div><div class="method-item"><b>03</b><h3>Build</h3><p>Connect the model, tools, and environment.</p></div><div class="method-item"><b>04</b><h3>Test</h3><p>Verify the result instead of assuming it.</p></div><div class="method-item"><b>05</b><h3>Improve</h3><p>Use the edge cases to shape the next version.</p></div></div></section>
 
-                            <!-- Antenna -->
-                            <path d="M160 40 L160 10" stroke="url(#accentGrad)" stroke-width="2.5" stroke-linecap="round"/>
-                            <circle cx="160" cy="8" r="6" fill="url(#accentGrad)"/>
-                            <circle cx="160" cy="8" r="3" fill="#03111f"/>
+    <section id="contact" class="reveal"><div class="contact"><div><div class="section-label">07 / Contact</div><h2>Have an AI idea or automation problem?</h2><p class="contact-copy">I am interested in practical agent workflows, AI-assisted development, and experiments that turn delegated intent into useful results.</p></div><div class="contact-links"><a href="https://wa.me/923222820804" target="_blank" rel="noreferrer">WhatsApp <span>Message -&gt;</span></a><a href="https://www.linkedin.com/in/salahuddin-muhammad" target="_blank" rel="noreferrer">LinkedIn <span>Connect -&gt;</span></a><a href="https://github.com/salahnewgthub" target="_blank" rel="noreferrer">GitHub <span>View profile -&gt;</span></a><button class="button secondary" id="open-chat" type="button">Ask the portfolio assistant <span aria-hidden="true">-&gt;</span></button></div></div></section>
+  </main>
 
-                            <!-- Eyes -->
-                            <g class="bot-eyes">
-                                <ellipse cx="110" cy="105" rx="18" ry="22" fill="#03111f" stroke="rgba(109,211,255,0.4)" stroke-width="1.5"/>
-                                <ellipse cx="110" cy="100" rx="7" ry="9" fill="#6dd3ff"/>
-                                <ellipse cx="113" cy="97" rx="2.5" ry="3" fill="#fff" opacity="0.9"/>
+  <footer class="site-footer"><span>Salahuddin Muhammad / AI systems in progress</span><span>Built with HTML, CSS, JavaScript and Three.js</span></footer>
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://unpkg.com/three@0.185.1/build/three.module.js"
+      }
+    }
+  </script>
+  <script type="module">
+    import { ChatWidget } from './chatbot.js';
+    import * as THREE from 'three';
 
-                                <ellipse cx="210" cy="105" rx="18" ry="22" fill="#03111f" stroke="rgba(109,211,255,0.4)" stroke-width="1.5"/>
-                                <ellipse cx="210" cy="100" rx="7" ry="9" fill="#6dd3ff"/>
-                                <ellipse cx="213" cy="97" rx="2.5" ry="3" fill="#fff" opacity="0.9"/>
-                            </g>
+    const chat = new ChatWidget({ apiEndpoint: '/api/chat' });
+    document.getElementById('open-chat').addEventListener('click', () => chat.open());
 
-                            <!-- Mouth/Speaker -->
-                            <g class="bot-mouth" transform="translate(160, 155)">
-                                <rect x="-30" y="-4" width="60" height="8" rx="4" fill="#03111f" stroke="rgba(164,139,255,0.5)" stroke-width="1"/>
-                                <rect x="-24" y="-2" width="12" height="4" rx="2" fill="url(#accentGrad)" class="mouth-bar bar1"/>
-                                <rect x="-8" y="-2" width="16" height="4" rx="2" fill="url(#accentGrad)" class="mouth-bar bar2"/>
-                                <rect x="8" y="-2" width="10" height="4" rx="2" fill="url(#accentGrad)" class="mouth-bar bar3"/>
-                                <rect x="20" y="-2" width="14" height="4" rx="2" fill="url(#accentGrad)" class="mouth-bar bar4"/>
-                            </g>
+    const menuToggle = document.querySelector('.menu-toggle');
+    const nav = document.getElementById('site-nav');
+    menuToggle.addEventListener('click', () => { const open = nav.classList.toggle('open'); menuToggle.setAttribute('aria-expanded', String(open)); });
+    nav.querySelectorAll('a').forEach((link) => link.addEventListener('click', () => { nav.classList.remove('open'); menuToggle.setAttribute('aria-expanded', 'false'); }));
 
-                            <!-- RAG Brain/Network visualization -->
-                            <g class="rag-network" transform="translate(160, 205)">
-                                <!-- Central node (RAG brain) -->
-                                <circle cx="0" cy="0" r="22" fill="rgba(109,211,255,0.1)" stroke="url(#accentGrad)" stroke-width="1.5" class="brain-core"/>
+    const revealObserver = new IntersectionObserver((entries) => entries.forEach((entry) => { if (entry.isIntersecting) entry.target.classList.add('visible'); }), { threshold: .12 });
+    document.querySelectorAll('.reveal').forEach((item) => revealObserver.observe(item));
 
-                                <!-- Orbiting nodes -->
-                                <g class="orbit-nodes">
-                                    <circle cx="-45" cy="-20" r="8" fill="rgba(109,211,255,0.2)" stroke="#6dd3ff" stroke-width="1.5" class="orbit-node node1">
-                                        <animateTransform attributeName="transform" type="rotate" from="0 -45 -20" to="360 -45 -20" dur="8s" repeatCount="indefinite"/>
-                                    </circle>
-                                    <circle cx="45" cy="-25" r="7" fill="rgba(164,139,255,0.2)" stroke="#a48bff" stroke-width="1.5" class="orbit-node node2">
-                                        <animateTransform attributeName="transform" type="rotate" from="360 45 -25" to="0 45 -25" dur="10s" repeatCount="indefinite"/>
-                                    </circle>
-                                    <circle cx="-35" cy="35" r="6" fill="rgba(127,255,212,0.2)" stroke="#7fffd4" stroke-width="1.5" class="orbit-node node3">
-                                        <animateTransform attributeName="transform" type="rotate" from="0 -35 35" to="360 -35 35" dur="12s" repeatCount="indefinite"/>
-                                    </circle>
-                                    <circle cx="40" cy="25" r="7" fill="rgba(109,211,255,0.2)" stroke="#6dd3ff" stroke-width="1.5" class="orbit-node node4">
-                                        <animateTransform attributeName="transform" type="rotate" from="360 40 25" to="0 40 25" dur="9s" repeatCount="indefinite"/>
-                                    </circle>
-                                </g>
-
-                                <!-- Connection lines -->
-                                <g class="connections" stroke="url(#accentGrad)" stroke-width="1" stroke-dasharray="4,4" opacity="0.5">
-                                    <line x1="0" y1="0" x2="-45" y2="-20" class="conn1"/>
-                                    <line x1="0" y1="0" x2="45" y2="-25" class="conn2"/>
-                                    <line x1="0" y1="0" x2="-35" y2="35" class="conn3"/>
-                                    <line x1="0" y1="0" x2="40" y2="25" class="conn4"/>
-                                </g>
-
-                                <!-- Brain label -->
-                                <text x="0" y="5" text-anchor="middle" font-family="Inter, sans-serif" font-size="8" font-weight="600" fill="#6dd3ff" letter-spacing="0.5">RAG</text>
-                            </g>
-
-                            <!-- Floating particles -->
-                            <g class="particles" fill="#6dd3ff" opacity="0.6">
-                                <circle cx="35" cy="60" r="2" class="particle p1">
-                                    <animate attributeName="cy" values="60;40;60" dur="3s" repeatCount="indefinite"/>
-                                    <animate attributeName="opacity" values="0.6;0.2;0.6" dur="3s" repeatCount="indefinite"/>
-                                </circle>
-                                <circle cx="285" cy="70" r="1.5" class="particle p2">
-                                    <animate attributeName="cy" values="70;50;70" dur="4s" repeatCount="indefinite"/>
-                                    <animate attributeName="opacity" values="0.4;0.1;0.4" dur="4s" repeatCount="indefinite"/>
-                                </circle>
-                                <circle cx="40" cy="220" r="2" class="particle p3">
-                                    <animate attributeName="cy" values="220;200;220" dur="3.5s" repeatCount="indefinite"/>
-                                    <animate attributeName="opacity" values="0.5;0.1;0.5" dur="3.5s" repeatCount="indefinite"/>
-                                </circle>
-                                <circle cx="280" cy="210" r="1.5" class="particle p4">
-                                    <animate attributeName="cy" values="210;190;210" dur="4.5s" repeatCount="indefinite"/>
-                                    <animate attributeName="opacity" values="0.3;0.1;0.3" dur="4.5s" repeatCount="indefinite"/>
-                                </circle>
-                            </g>
-
-                            <!-- Click hint -->
-                            <text x="160" y="262" text-anchor="middle" font-family="Inter, sans-serif" font-size="16" font-weight="800" fill="#00ff88" letter-spacing="0.1em" class="click-hint" style="filter: drop-shadow(0 0 8px #00ff88);">Click to Chat</text>
-                        </svg>
-                    </div>
-
-                    <div class="rag-chatbot-info">
-                        <h3>RAG-Powered AI Assistant</h3>
-                        <p>Retrieval-Augmented Generation chatbot with knowledge about my projects, skills, and experience.</p>
-                    </div>
-                </div>
-
-                <!-- WhatsApp connect button (appears after clicking 'Connect with me') -->
-                <a id="whatsappConnectBtn" class="btn primary" href="https://wa.me/923222820804" target="_blank" rel="noreferrer" style="display:none; align-items:center; justify-content:center; gap:10px; width:max-content; margin:20px auto 0;">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path>
-                    </svg>
-                    Connect on WhatsApp
-                </a>
-            </div>
-        </section>
-
-        <section class="section footer">
-            <p>Open to new ideas, collaborations, and creative opportunities.</p>
-        </section>
-    </div>
-
-    <!-- Chat Widget -->
-    <div id="chat-widget-root"></div>
-
-    <script type="module">
-        import { ChatWidget } from './chatbot.js';
-        window.chatWidget = new ChatWidget({ apiEndpoint: '/api/chat' });
-
-        // RAG Chatbot card click handler
-        const ragTrigger = document.getElementById('rag-chatbot-trigger');
-        if (ragTrigger && window.chatWidget) {
-            const openChat = () => {
-                if (!window.chatWidget.isOpen) {
-                    window.chatWidget.open();
-                }
-            };
-
-            ragTrigger.addEventListener('click', openChat);
-            ragTrigger.addEventListener('keydown', (e) => {
-                if (e.key === 'Enter' || e.key === ' ') {
-                    e.preventDefault();
-                    openChat();
-                }
-            });
-        }
-    </script>
-
-    <script type="importmap">
-        {
-            "imports": {
-                "three": "https://unpkg.com/three@0.185.1/build/three.module.js",
-                "three/addons/": "https://unpkg.com/three@0.185.1/examples/jsm/"
-            }
-        }
-    </script>
-
-    <script type="module">
-        import * as THREE from 'three';
-        import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-
-        const portfolio = {
-            name: 'Salahuddin Muhammad',
-            headline: 'Creative developer building immersive digital experiences.',
-            socials: [
-                { label: 'GitHub', url: 'https://github.com/salahnewgthub' },
-                { label: 'Facebook', url: 'https://www.facebook.com/salahuddin.muhammad.391' },
-                { label: 'LinkedIn', url: 'https://www.linkedin.com/in/salahuddin-muhammad' },
-                { label: 'YouTube', url: 'https://www.youtube.com/@MrSalah3' },
-                { label: 'WhatsApp', url: 'https://wa.me/923222820804' }
-            ],
-            contact: {
-                title: 'Let’s build something memorable',
-                body: 'Available for freelance work, creative collaborations, and ambitious digital ideas.',
-                primary: 'https://wa.me/923222820804',
-                secondary: 'https://www.linkedin.com/in/salahuddin-muhammad'
-            }
-        };
-
-        const socialLinks = document.getElementById('socialLinks');
-        socialLinks.innerHTML = portfolio.socials.map(link => `<a href="${link.url}" target="_blank" rel="noreferrer">${link.label}</a>`).join('');
-
-        const contactContent = document.getElementById('contactContent');
-        contactContent.innerHTML = `
-            <h3>Let’s build AI Systems That Think, Act, and Deliver.</h3>
-            <div class="contact-actions">
-                <a class="btn primary" href="${portfolio.contact.primary}" target="_blank" rel="noreferrer">Message on WhatsApp</a>
-                <a class="btn secondary" href="${portfolio.contact.secondary}" target="_blank" rel="noreferrer">Connect on LinkedIn</a>
-            </div>
-        `;
-
-        const loadingScreen = document.getElementById('loadingScreen');
-        const cursorDot = document.querySelector('.cursor-dot');
-        const cursorRing = document.querySelector('.cursor-ring');
-        const pointer = { x: 0, y: 0 };
-
-        window.addEventListener('mousemove', (event) => {
-            pointer.x = (event.clientX / window.innerWidth - 0.5) * 2;
-            pointer.y = (event.clientY / window.innerHeight - 0.5) * 2;
-            cursorDot.style.left = `${event.clientX}px`;
-            cursorDot.style.top = `${event.clientY}px`;
-            cursorRing.style.left = `${event.clientX}px`;
-            cursorRing.style.top = `${event.clientY}px`;
-        });
-
-        window.addEventListener('mouseleave', () => {
-            cursorRing.style.opacity = '0';
-            cursorDot.style.opacity = '0';
-        });
-
-        window.addEventListener('mouseenter', () => {
-            cursorRing.style.opacity = '1';
-            cursorDot.style.opacity = '1';
-        });
-
-        // Touch handling for tilt effect on mobile (OrbitControls disabled)
-        window.addEventListener('touchmove', (event) => {
-            if (event.touches.length > 0) {
-                const touch = event.touches[0];
-                pointer.x = (touch.clientX / window.innerWidth - 0.5) * 2;
-                pointer.y = (touch.clientY / window.innerHeight - 0.5) * 2;
-            }
-        }, { passive: true });
-
-        const revealItems = Array.from(document.querySelectorAll('.reveal'));
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach((entry) => {
-                if (entry.isIntersecting) {
-                    entry.target.classList.add('visible');
-                }
-            });
-        }, { threshold: 0.18 });
-        revealItems.forEach((item) => observer.observe(item));
-
-        setTimeout(() => {
-            loadingScreen.classList.add('hidden');
-        }, 1100);
-
-        const sceneEl = document.getElementById('scene');
-        const scene = new THREE.Scene();
-        scene.fog = new THREE.FogExp2(0x060816, 0.05);
-
-        const camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 100);
-        camera.position.set(0, 2.6, 8.4);
-
-        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-        renderer.setSize(window.innerWidth, window.innerHeight);
-        sceneEl.appendChild(renderer.domElement);
-
-        // Disable OrbitControls on touch devices so links/buttons work on mobile
-        const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
-        let controls;
-        if (!isTouchDevice) {
-          controls = new OrbitControls(camera, renderer.domElement);
-          controls.enableDamping = true;
-          controls.enablePan = false;
-          controls.minDistance = 4;
-          controls.maxDistance = 14;
-          controls.autoRotate = true;
-          controls.autoRotateSpeed = 0.45;
-          controls.enableZoom = true;
-          // Enable pointer events on canvas for OrbitControls on non-touch devices
-          renderer.domElement.style.pointerEvents = 'auto';
-        } else {
-          // On touch devices, canvas and scene already have pointer-events: none via CSS
-        }
-
-        const ambientLight = new THREE.HemisphereLight(0x87ceff, 0x0b1030, 1.25);
-        scene.add(ambientLight);
-
-        const keyLight = new THREE.DirectionalLight(0x8fe0ff, 1.2);
-        keyLight.position.set(4, 6, 5);
-        scene.add(keyLight);
-
-        const fillLight = new THREE.PointLight(0x8f63ff, 1.6, 24);
-        fillLight.position.set(-4, 2, -4);
-        scene.add(fillLight);
-
-        const floor = new THREE.Mesh(
-            new THREE.CircleGeometry(9, 64),
-            new THREE.MeshStandardMaterial({ color: 0x0c1428, roughness: 0.26, metalness: 0.16 })
-        );
-        floor.rotation.x = -Math.PI / 2;
-        floor.position.y = -1.1;
-        scene.add(floor);
-
-        const gridHelper = new THREE.GridHelper(18, 24, 0x8fe0ff, 0x1f2944);
-        gridHelper.position.y = -0.97;
-        gridHelper.material.transparent = true;
-        gridHelper.material.opacity = 0.25;
-        scene.add(gridHelper);
-
-        const portal = new THREE.Group();
-        scene.add(portal);
-
-        const ring = new THREE.Mesh(
-            new THREE.TorusGeometry(2.35, 0.04, 16, 90),
-            new THREE.MeshStandardMaterial({ color: 0x6dd3ff, emissive: 0x1a3348, roughness: 0.15, metalness: 0.7 })
-        );
-        ring.rotation.x = Math.PI / 2.2;
-        portal.add(ring);
-
-        const core = new THREE.Mesh(
-            new THREE.OctahedronGeometry(1.15, 0),
-            new THREE.MeshStandardMaterial({ color: 0x8f63ff, emissive: 0x1b1235, roughness: 0.18, metalness: 0.75, flatShading: true })
-        );
-        core.position.y = 0.5;
-        portal.add(core);
-
-        const orbiters = [];
-        const orbitalColors = [0x6dd3ff, 0xa48bff, 0x7fffd4];
-        for (let i = 0; i < 6; i += 1) {
-            const material = new THREE.MeshStandardMaterial({ color: orbitalColors[i % orbitalColors.length], emissive: 0x132332, roughness: 0.28, metalness: 0.7 });
-            const mesh = new THREE.Mesh(new THREE.TorusGeometry(0.28, 0.08, 16, 80), material);
-            mesh.rotation.x = Math.PI / 2;
-            const angle = (i / 6) * Math.PI * 2;
-            mesh.position.set(Math.cos(angle) * 2.3, 0.8 + (i % 3) * 0.22, Math.sin(angle) * 2.3);
-            portal.add(mesh);
-            orbiters.push(mesh);
-        }
-
-        const particles = new THREE.Group();
-        scene.add(particles);
-        const particleGeometry = new THREE.BufferGeometry();
-        const particleCount = 170;
-        const positions = new Float32Array(particleCount * 3);
-        for (let i = 0; i < particleCount; i += 1) {
-            positions[i * 3] = (Math.random() - 0.5) * 16;
-            positions[i * 3 + 1] = Math.random() * 4 + 0.2;
-            positions[i * 3 + 2] = (Math.random() - 0.5) * 16;
-        }
-        particleGeometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-        const particleMaterial = new THREE.PointsMaterial({ color: 0x8fe0ff, size: 0.04, transparent: true, opacity: 0.8 });
-        const pointCloud = new THREE.Points(particleGeometry, particleMaterial);
-        particles.add(pointCloud);
-
-        const clock = new THREE.Clock();
-        function animate() {
-            requestAnimationFrame(animate);
-            const elapsed = clock.getElapsedTime();
-            const tiltX = pointer.y * 0.18;
-            const tiltY = pointer.x * 0.16;
-            portal.rotation.y = elapsed * 0.35 + tiltY;
-            portal.rotation.x = tiltX * 0.4;
-            portal.position.y = Math.sin(elapsed * 0.9) * 0.12 + tiltX * 0.08;
-            orbiters.forEach((mesh, index) => {
-                mesh.rotation.x = elapsed * (0.8 + index * 0.1) + tiltX * 0.4;
-                mesh.rotation.y = elapsed * (0.5 + index * 0.09) + tiltY * 0.4;
-            });
-            particles.rotation.y = elapsed * 0.05 + tiltY * 0.1;
-            if (controls) controls.update();
-            renderer.render(scene, camera);
-        }
-        animate();
-
-        function onResize() {
-            camera.aspect = window.innerWidth / window.innerHeight;
-            camera.updateProjectionMatrix();
-            renderer.setSize(window.innerWidth, window.innerHeight);
-        }
-        window.addEventListener('resize', onResize);
-    </script>
-
-    <!-- Independent init script: runs even if Three.js fails/blocked on mobile -->
-    <script>
-      (function() {
-        // 1. Hide loading screen regardless of Three.js
-        const loadingScreen = document.getElementById('loadingScreen');
-        if (loadingScreen) {
-          setTimeout(() => loadingScreen.classList.add('hidden'), 1100);
-        }
-
-        // 2. Make all .reveal elements visible (IntersectionObserver fallback if Three.js fails)
-        const revealItems = Array.from(document.querySelectorAll('.reveal'));
-        if (revealItems.length > 0) {
-          const observer = new IntersectionObserver((entries) => {
-            entries.forEach((entry) => {
-              if (entry.isIntersecting) {
-                entry.target.classList.add('visible');
-              }
-            });
-          }, { threshold: 0.05, rootMargin: '100px' }); // Lower threshold + rootMargin so tall elements trigger on mobile
-          revealItems.forEach((item) => observer.observe(item));
-        }
-
-        // 3. Navigation click handlers - use native scrollIntoView (respects CSS scroll-margin-top)
-        const anchorLinks = Array.from(document.querySelectorAll('a[href^="#"]'));
-
-        anchorLinks.forEach((anchor) => {
-          anchor.addEventListener('click', (event) => {
-            const targetId = anchor.getAttribute('href')?.slice(1);
-            if (!targetId || targetId === 'loadingScreen') return;
-            const targetElement = document.getElementById(targetId);
-            if (!targetElement) return;
-
-            event.preventDefault();
-            window.history.pushState(null, '', `#${targetId}`);
-            // Reveal the WhatsApp button if it's the target (it's hidden by default)
-            if (targetId === 'whatsappConnectBtn') {
-              targetElement.style.display = 'flex';
-            }
-            targetElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
-          });
-        });
-      })();
-    </script>
-
-    <!-- Show WhatsApp connect button when "Connect with me" is clicked -->
-    <script>
-      (function() {
-        const connectBtn = document.querySelector('.hero-actions a[href="#whatsappConnectBtn"]');
-        const whatsappBtn = document.getElementById('whatsappConnectBtn');
-        if (connectBtn && whatsappBtn) {
-          connectBtn.addEventListener('click', function(e) {
-            // Small delay to let scroll start, then show button
-            setTimeout(() => {
-              whatsappBtn.style.display = 'flex';
-            }, 300);
-          });
-        }
-      })();
-    </script>
-
-    <!-- Independent social links (runs even if Three.js fails) -->
-    <script>
-      (function() {
-        const socialLinks = document.getElementById('socialLinks');
-        if (socialLinks) {
-          const socials = [
-            { label: 'GitHub', url: 'https://github.com/salahnewgthub' },
-            { label: 'Facebook', url: 'https://www.facebook.com/salahuddin.muhammad.391' },
-            { label: 'LinkedIn', url: 'https://www.linkedin.com/in/salahuddin-muhammad' },
-            { label: 'YouTube', url: 'https://www.youtube.com/@MrSalah3' },
-            { label: 'WhatsApp', url: 'https://wa.me/923222820804' }
-          ];
-          socialLinks.innerHTML = socials.map(link =>
-            '<a href="' + link.url + '" target="_blank" rel="noreferrer">' + link.label + '</a>'
-          ).join('');
-        }
-      })();
-    </script>
-
-    <!-- Independent cursor script (runs even if Three.js fails) -->
-    <script>
-      (function() {
-        const cursorDot = document.querySelector('.cursor-dot');
-        const cursorRing = document.querySelector('.cursor-ring');
-        if (!cursorDot || !cursorRing) return;
-
-        let isTouch = false;
-        window.addEventListener('touchstart', () => { isTouch = true; }, { passive: true });
-        window.addEventListener('mousemove', () => { if (!isTouch) { cursorDot.style.opacity = '1'; cursorRing.style.opacity = '1'; } }, { passive: true });
-        window.addEventListener('mouseleave', () => { cursorDot.style.opacity = '0'; cursorRing.style.opacity = '0'; });
-
-        document.addEventListener('mousemove', (e) => {
-          if (isTouch) return;
-          cursorDot.style.left = e.clientX + 'px';
-          cursorDot.style.top = e.clientY + 'px';
-          cursorRing.style.left = e.clientX + 'px';
-          cursorRing.style.top = e.clientY + 'px';
-        });
-      })();
-    </script>
+    const container = document.getElementById('scene');
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(42, 1, .1, 100);
+    camera.position.set(0, 1.2, 7.5);
+    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
+    container.appendChild(renderer.domElement);
+    const group = new THREE.Group();
+    scene.add(group);
+    const core = new THREE.Mesh(new THREE.IcosahedronGeometry(1.05, 1), new THREE.MeshStandardMaterial({ color: 0xc4eb77, emissive: 0x32451b, roughness: .24, metalness: .5, wireframe: true }));
+    group.add(core);
+    const nodes = [];
+    const lines = new THREE.Group();
+    group.add(lines);
+    const colors = [0xc4eb77, 0xf19b5b, 0x91c7d4];
+    for (let i = 0; i < 12; i += 1) {
+      const angle = (i / 12) * Math.PI * 2;
+      const radius = 2.1 + (i % 3) * .32;
+      const node = new THREE.Mesh(new THREE.SphereGeometry(.075 + (i % 2) * .03, 12, 12), new THREE.MeshBasicMaterial({ color: colors[i % colors.length] }));
+      node.position.set(Math.cos(angle) * radius, Math.sin(angle * 1.7) * .75, Math.sin(angle) * radius);
+      group.add(node); nodes.push(node);
+      const points = [new THREE.Vector3(0, 0, 0), node.position.clone()];
+      const line = new THREE.Line(new THREE.BufferGeometry().setFromPoints(points), new THREE.LineBasicMaterial({ color: colors[i % colors.length], transparent: true, opacity: .35 }));
+      lines.add(line);
+    }
+    scene.add(new THREE.HemisphereLight(0xd9f4e4, 0x152018, 1.5));
+    const light = new THREE.PointLight(0xc4eb77, 2.4, 18); light.position.set(2, 3, 4); scene.add(light);
+    const pointer = { x: 0, y: 0 };
+    window.addEventListener('pointermove', (event) => { pointer.x = (event.clientX / window.innerWidth - .5) * 2; pointer.y = (event.clientY / window.innerHeight - .5) * 2; }, { passive: true });
+    const clock = new THREE.Clock();
+    function resize() { const width = container.clientWidth; const height = container.clientHeight; camera.aspect = width / height; camera.updateProjectionMatrix(); renderer.setSize(width, height, false); }
+    function animate() { requestAnimationFrame(animate); const time = clock.getElapsedTime(); group.rotation.y = time * .16 + pointer.x * .16; group.rotation.x = pointer.y * .08; core.rotation.z = time * .12; nodes.forEach((node, index) => { node.scale.setScalar(1 + Math.sin(time * 1.4 + index) * .18); }); renderer.render(scene, camera); }
+    window.addEventListener('resize', resize); resize(); animate();
+  </script>
 </body>
 </html>
