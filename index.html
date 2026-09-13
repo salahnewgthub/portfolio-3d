@@ -461,6 +461,161 @@
             font-size: 0.94rem;
         }
 
+        .remote-delegation {
+            margin: 28px 0;
+            padding: clamp(18px, 3vw, 28px);
+            border: 1px solid rgba(109, 211, 255, 0.24);
+            border-radius: 22px;
+            background: linear-gradient(135deg, rgba(109, 211, 255, 0.09), rgba(164, 139, 255, 0.08));
+            overflow: hidden;
+        }
+
+        .remote-delegation-header {
+            display: flex;
+            justify-content: space-between;
+            gap: 18px;
+            align-items: flex-start;
+            margin-bottom: 22px;
+        }
+
+        .remote-delegation-kicker {
+            margin: 0 0 8px;
+            color: var(--accent);
+            font-size: 0.75rem;
+            font-weight: 700;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+        }
+
+        .remote-delegation h2 {
+            margin: 0;
+            font-size: clamp(1.35rem, 2.8vw, 2rem);
+            line-height: 1.1;
+        }
+
+        .remote-delegation-intro {
+            max-width: 680px;
+            margin: 10px 0 0;
+            color: var(--muted);
+            line-height: 1.75;
+        }
+
+        .remote-delegation-badge {
+            flex: 0 0 auto;
+            padding: 8px 11px;
+            border: 1px solid rgba(127, 255, 212, 0.28);
+            border-radius: 999px;
+            color: #7fffd4;
+            background: rgba(127, 255, 212, 0.08);
+            font-size: 0.72rem;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+
+        .remote-flow {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 12px;
+            margin: 22px 0;
+        }
+
+        .remote-flow-step {
+            position: relative;
+            min-height: 150px;
+            padding: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            background: rgba(3, 17, 31, 0.36);
+            animation: flowRise 700ms ease both;
+        }
+
+        .remote-flow-step:nth-child(2) { animation-delay: 90ms; }
+        .remote-flow-step:nth-child(3) { animation-delay: 180ms; }
+        .remote-flow-step:nth-child(4) { animation-delay: 270ms; }
+
+        @keyframes flowRise {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .remote-flow-step::after {
+            content: "→";
+            position: absolute;
+            right: -15px;
+            top: 50%;
+            color: var(--accent);
+            font-size: 1.3rem;
+            transform: translateY(-50%);
+            z-index: 1;
+        }
+
+        .remote-flow-step:last-child::after { content: none; }
+
+        .remote-flow-number {
+            display: block;
+            margin-bottom: 18px;
+            color: var(--accent);
+            font-size: 0.72rem;
+            font-weight: 700;
+            letter-spacing: 0.16em;
+        }
+
+        .remote-flow-step h3 {
+            margin: 0 0 8px;
+            font-size: 1rem;
+        }
+
+        .remote-flow-step p {
+            margin: 0;
+            color: var(--muted);
+            font-size: 0.88rem;
+            line-height: 1.55;
+        }
+
+        .remote-example {
+            display: grid;
+            grid-template-columns: 1fr 0.8fr;
+            gap: 14px;
+            align-items: stretch;
+        }
+
+        .remote-example-panel {
+            padding: 16px;
+            border-radius: 16px;
+            background: rgba(255, 255, 255, 0.045);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .remote-example-label {
+            display: block;
+            margin-bottom: 10px;
+            color: var(--muted);
+            font-size: 0.74rem;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+        }
+
+        .remote-example blockquote {
+            margin: 0;
+            color: var(--text);
+            line-height: 1.6;
+        }
+
+        .remote-example code {
+            display: block;
+            color: #7fffd4;
+            font: 600 0.95rem/1.6 ui-monospace, SFMono-Regular, Consolas, monospace;
+            overflow-wrap: anywhere;
+        }
+
+        .remote-delegation-note {
+            margin: 18px 0 0;
+            color: var(--muted);
+            font-size: 0.9rem;
+            line-height: 1.65;
+        }
+
         .info-card h3 { margin-top: 0; }
         .info-card p, .info-card li { color: var(--muted); line-height: 1.7; }
 
@@ -522,6 +677,8 @@
             .project-grid { grid-template-columns: 1fr; }
             .info-grid { grid-template-columns: 1fr; }
             .hero-ambient { display: none; }
+            .remote-flow { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+            .remote-flow-step::after { content: none; }
         }
 
         @media (max-width: 760px) {
@@ -538,6 +695,8 @@
             .nav-links { gap: 10px; }
             .topbar { padding-bottom: 18px; }
             .scroll-hint { text-align: center; }
+            .remote-delegation-header { flex-direction: column; }
+            .remote-example { grid-template-columns: 1fr; }
         }
 
         @media (max-width: 640px) {
@@ -549,6 +708,8 @@
             .hero-actions { gap: 10px; }
             .service-card { padding: 18px; }
             .service-card h3 { font-size: 1rem; }
+            .remote-flow { grid-template-columns: 1fr; }
+            .remote-flow-step { min-height: 0; }
         }
 
         /* Chat Widget Styles */
@@ -1205,6 +1366,49 @@
                     <p>I built a remotely accessible <strong>Agentic AI system</strong> powered by OpenClaw and connected it with communication platforms such as WhatsApp and Discord.</p>
                     <p>Now, my mobile phone becomes my remote control for my AI employee.</p>
                     <p>Whether I am at home, travelling, or away from my laptop, I can send my agent a task through my mobile phone. My agent receives my instructions, performs the assigned work using its available tools and capabilities, and informs me when the task is completed.</p>
+                    <div class="remote-delegation reveal">
+                        <div class="remote-delegation-header">
+                            <div>
+                                <p class="remote-delegation-kicker">New capability · practical agentic AI</p>
+                                <h2>Remote AI Task Delegation</h2>
+                                <p class="remote-delegation-intro">I am building toward a practical AI digital employee: a connected agent that can receive a delegated task remotely and carry out an approved action on my computer. This moves beyond a chatbot that only explains what to do.</p>
+                            </div>
+                            <span class="remote-delegation-badge">Demonstrated workflow</span>
+                        </div>
+                        <div class="remote-flow" aria-label="Remote task delegation workflow">
+                            <article class="remote-flow-step">
+                                <span class="remote-flow-number">01 · MOBILE</span>
+                                <h3>Send the task</h3>
+                                <p>I send a natural-language request through ChatGPT and OpenAI Codex while away from my laptop.</p>
+                            </article>
+                            <article class="remote-flow-step">
+                                <span class="remote-flow-number">02 · AI AGENT</span>
+                                <h3>Interpret and act</h3>
+                                <p>The connected agent receives the instruction and uses its available computer capabilities to perform it.</p>
+                            </article>
+                            <article class="remote-flow-step">
+                                <span class="remote-flow-number">03 · LAPTOP</span>
+                                <h3>Make the change</h3>
+                                <p>The requested action happens on my laptop, even though I am not physically at the keyboard.</p>
+                            </article>
+                            <article class="remote-flow-step">
+                                <span class="remote-flow-number">04 · RESULT</span>
+                                <h3>Verify the outcome</h3>
+                                <p>I can return later and find the completed result on the computer.</p>
+                            </article>
+                        </div>
+                        <div class="remote-example">
+                            <div class="remote-example-panel">
+                                <span class="remote-example-label">From my mobile</span>
+                                <blockquote>"Create a folder named myownfolder on my laptop Desktop."</blockquote>
+                            </div>
+                            <div class="remote-example-panel">
+                                <span class="remote-example-label">Observed result</span>
+                                <code>Desktop/myownfolder</code>
+                            </div>
+                        </div>
+                        <p class="remote-delegation-note"><strong>Why it matters:</strong> I am experimenting with AI agents that can move beyond conversation and perform useful, bounded actions on a real computer. This is one step toward a dependable AI digital employee, not a claim of unlimited autonomy.</p>
+                    </div>
                     <hr />
                     <h2>How My AI Employee Works</h2>
                     <p><strong>1. I Give an Instruction</strong><br />I send a natural-language request to my AI agent through WhatsApp or Discord.</p>
@@ -1475,20 +1679,20 @@
         import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
         const portfolio = {
-            name: ‘Salahuddin Muhammad’,
-            headline: ‘Creative developer building immersive digital experiences.’,
+            name: 'Salahuddin Muhammad',
+            headline: 'Creative developer building immersive digital experiences.',
             socials: [
-                { label: ‘GitHub’, url: ‘https://github.com/salahnewgthub’ },
-                { label: ‘Facebook’, url: ‘https://www.facebook.com/salahuddin.muhammad.391’ },
-                { label: ‘LinkedIn’, url: ‘https://www.linkedin.com/in/salahuddin-muhammad’ },
-                { label: ‘YouTube’, url: ‘https://www.youtube.com/@MrSalah3’ },
-                { label: ‘WhatsApp’, url: ‘https://wa.me/923222820804’ }
+                { label: 'GitHub', url: 'https://github.com/salahnewgthub' },
+                { label: 'Facebook', url: 'https://www.facebook.com/salahuddin.muhammad.391' },
+                { label: 'LinkedIn', url: 'https://www.linkedin.com/in/salahuddin-muhammad' },
+                { label: 'YouTube', url: 'https://www.youtube.com/@MrSalah3' },
+                { label: 'WhatsApp', url: 'https://wa.me/923222820804' }
             ],
             contact: {
-                title: ‘Let’s build something memorable’,
-                body: ‘Available for freelance work, creative collaborations, and ambitious digital ideas.’,
-                primary: ‘https://wa.me/923222820804’,
-                secondary: ‘https://www.linkedin.com/in/salahuddin-muhammad’
+                title: 'Let’s build something memorable',
+                body: 'Available for freelance work, creative collaborations, and ambitious digital ideas.',
+                primary: 'https://wa.me/923222820804',
+                secondary: 'https://www.linkedin.com/in/salahuddin-muhammad'
             }
         };
 

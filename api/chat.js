@@ -70,6 +70,12 @@ const KNOWLEDGE_BASE = [
     content: `24/7 Autonomous AI Digital Employee: An agentic AI system powered by OpenClaw, connected to WhatsApp and Discord for remote task delegation. Allows delegating tasks from mobile phone while travelling. Features: Work from anywhere, 24/7 digital employee, natural language interaction, autonomous task execution, mobile-first control via WhatsApp/Discord, task completion feedback. Tech: OpenClaw, Agentic AI, Autonomous AI Agents, WhatsApp Integration, Discord Integration, AI Model Integration, Task Automation, Remote AI Interaction, Tool-Based AI Workflows.`,
   },
   {
+    id: 'project-remote-codex',
+    category: 'Projects',
+    keywords: ['codex', 'openai codex', 'remote computer', 'computer action', 'folder', 'laptop desktop', 'digital employee', 'task delegation'],
+    content: `Remote AI Task Delegation: Salahuddin is experimenting with a practical AI digital employee workflow in which he can send a bounded computer task from a mobile device through ChatGPT and OpenAI Codex while away from his laptop. In a demonstrated example, the agent receives the instruction to create a folder named myownfolder on the laptop Desktop and the folder is created on the computer. This is a practical agentic-AI experiment, not a claim of unlimited autonomy or AGI.`,
+  },
+  {
     id: 'contact',
     category: 'Contact',
     keywords: ['contact', 'whatsapp', 'linkedin', 'github', 'facebook', 'youtube', 'hire', 'freelance', 'collaborate', 'email', 'reach'],
