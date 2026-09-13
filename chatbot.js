@@ -33,11 +33,12 @@ export class ChatWidget {
       <div id="chat-panel" class="chat-panel" style="display: none;">
         <div class="chat-header">
           <div class="chat-header-info">
-            <div class="chat-avatar">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <rect x="2" y="3" width="20" height="14" rx="2"></rect>
-                <path d="M8 21h8"></path>
-                <path d="M12 17v4"></path>
+            <div class="chat-avatar" aria-hidden="true">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                <path d="M5 5h14v14H5z" stroke="currentColor" stroke-width="1.5"></path>
+                <path d="M8 15V9l4 4 4-4v6" stroke="currentColor" stroke-width="1.8" stroke-linecap="square"></path>
+                <circle cx="5" cy="5" r="1.5" fill="currentColor"></circle>
+                <circle cx="19" cy="19" r="1.5" fill="currentColor"></circle>
               </svg>
             </div>
             <div class="chat-title">
