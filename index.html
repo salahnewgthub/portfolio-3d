@@ -267,7 +267,10 @@
     container.appendChild(renderer.domElement);
     const group = new THREE.Group();
     scene.add(group);
-    const core = new THREE.Mesh(new THREE.IcosahedronGeometry(1.05, 1), new THREE.MeshStandardMaterial({ color: 0xc4eb77, emissive: 0x32451b, roughness: .24, metalness: .5, wireframe: true }));
+    const coreGeometry = new THREE.IcosahedronGeometry(1.05, 2);
+    const coreFill = new THREE.Mesh(coreGeometry, new THREE.MeshBasicMaterial({ color: 0xc4eb77, transparent: true, opacity: .12 }));
+    group.add(coreFill);
+    const core = new THREE.Mesh(coreGeometry, new THREE.MeshStandardMaterial({ color: 0xc4eb77, emissive: 0x32451b, roughness: .24, metalness: .5, wireframe: true }));
     group.add(core);
     const nodes = [];
     const lines = new THREE.Group();
@@ -288,7 +291,7 @@
     const pointer = { x: 0, y: 0 };
     window.addEventListener('pointermove', (event) => { pointer.x = (event.clientX / window.innerWidth - .5) * 2; pointer.y = (event.clientY / window.innerHeight - .5) * 2; }, { passive: true });
     const clock = new THREE.Clock();
-    function resize() { const width = container.clientWidth; const height = container.clientHeight; const compact = width / height < 1.55; camera.aspect = width / height; camera.position.set(0, compact ? .2 : 1.2, compact ? 9.2 : 7.5); camera.updateProjectionMatrix(); group.scale.setScalar(compact ? .62 : 1); renderer.setSize(width, height, false); }
+    function resize() { const width = container.clientWidth; const height = container.clientHeight; const compact = width / height < 1.55; camera.aspect = width / height; camera.position.set(0, compact ? 0 : 1.2, compact ? 10.5 : 7.5); camera.updateProjectionMatrix(); group.position.y = compact ? .35 : 0; group.scale.setScalar(compact ? .42 : 1); renderer.setSize(width, height, false); }
     function animate() { requestAnimationFrame(animate); const time = clock.getElapsedTime(); group.rotation.y = time * .16 + pointer.x * .16; group.rotation.x = pointer.y * .08; core.rotation.z = time * .12; nodes.forEach((node, index) => { node.scale.setScalar(1 + Math.sin(time * 1.4 + index) * .18); }); renderer.render(scene, camera); }
     window.addEventListener('resize', resize); resize(); animate();
   </script>
