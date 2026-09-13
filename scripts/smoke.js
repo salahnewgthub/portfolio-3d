@@ -1,5 +1,5 @@
 const https = require('https');
-const url = 'https://salah-portfolio.vercel.app';
+const url = 'https://portfolio-3d-opal-six.vercel.app';
 
 https.get(url, (res) => {
   console.log('statusCode:', res.statusCode);
