@@ -19,7 +19,7 @@ export class ChatWidget {
     this.widget = document.createElement('div');
     this.widget.id = 'chat-widget';
     this.widget.innerHTML = `
-      <button id="chat-toggle" class="chat-toggle" aria-label="Open chat assistant" title="Chat with AI Assistant">
+      <button id="chat-toggle" class="chat-toggle" aria-label="Open RAG portfolio assistant" title="Open RAG portfolio assistant">
         <svg class="chat-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
         </svg>
@@ -41,8 +41,8 @@ export class ChatWidget {
               </svg>
             </div>
             <div class="chat-title">
-              <h4>AI Assistant</h4>
-              <span class="chat-status">Online</span>
+              <h4>RAG Portfolio Assistant</h4>
+              <span class="chat-status">Knowledge base ready</span>
             </div>
           </div>
           <button id="chat-minimize" class="chat-control-btn" aria-label="Minimize chat" title="Minimize">
@@ -181,7 +181,7 @@ export class ChatWidget {
           </svg>
         </div>
         <div class="message-content">
-          <div class="message-text">Hi! I'm Salahuddin's AI assistant. Ask me about his projects, skills, experience, or how to get in touch.</div>
+          <div class="message-text">Hi! I can help you explore Salahuddin's projects, AI experiments, tools, and contact paths using this portfolio's focused knowledge base.</div>
           <div class="message-time">${this.formatTime(new Date())}</div>
         </div>
       </div>
@@ -192,10 +192,10 @@ export class ChatWidget {
 
   renderSuggestions() {
     const suggestions = [
-      'What projects have you built?',
-      'What are your main skills?',
-      'Tell me about your AI employee',
-      'How can I contact you?',
+      'What projects are featured?',
+      'Tell me about remote task delegation',
+      'What tools does Salahuddin use?',
+      'How can I contact him?',
     ];
 
     this.suggestionsContainer.innerHTML = suggestions
