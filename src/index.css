@@ -1,0 +1,25 @@
+:root {
+  --color-bg: #050505;
+  --color-surface: #101010;
+  --color-primary: #00d4ff;
+  --color-accent: #9d4edd;
+  --color-text: #e0e0e0;
+  --font-main: 'Inter', sans-serif;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background-color: var(--color-bg);
+  color: var(--color-text);
+  font-family: var(--font-main);
+  line-height: 1.6;
+}
