@@ -1,0 +1,26 @@
+.skills-section {
+  padding: 5rem 3rem;
+}
+
+.skills-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 2rem;
+  margin-top: 2rem;
+}
+
+.skill-card {
+  background: var(--color-surface);
+  padding: 2rem;
+  border-radius: 1rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.skill-card h3 {
+  color: var(--color-primary);
+  margin-bottom: 1rem;
+}
+
+.skill-card ul {
+  list-style: none;
+}

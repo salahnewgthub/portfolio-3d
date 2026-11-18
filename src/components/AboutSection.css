@@ -1,0 +1,24 @@
+.about-section {
+  padding: 5rem 3rem;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 3rem;
+  align-items: center;
+  background: var(--color-surface);
+  min-height: 500px;
+}
+
+.about-content h2 {
+  font-size: 2.5rem;
+  color: var(--color-primary);
+  margin-bottom: 1.5rem;
+}
+
+.about-content p {
+  margin-bottom: 1rem;
+}
+
+.about-visual {
+  height: 400px;
+  width: 100%;
+}
